@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#121313">
+  <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
+  <title>SC220 MKII Support – Diagnostic Checklist & Bug Report</title>
+  <meta name="description" content="Recording Tech SC220 MKII support checklist: model, wiring, Windows endpoints, sample rate, input mode, meters, OBS, SC220 Live, diagnostic order, and report template.">
+  <link rel="canonical" href="https://masarray.github.io/sc220-download/en/sc220-mkii-audio-interface/support/">
+  <link rel="alternate" hreflang="id" href="https://masarray.github.io/sc220-download/sc220-mkii-audio-interface/support/">
+  <link rel="alternate" hreflang="en" href="https://masarray.github.io/sc220-download/en/sc220-mkii-audio-interface/support/">
+  <link rel="alternate" hreflang="x-default" href="https://masarray.github.io/sc220-download/sc220-mkii-audio-interface/support/">
+  <link rel="icon" href="../../../favicon.svg" type="image/svg+xml">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="SC220 Live">
+  <meta property="og:url" content="https://masarray.github.io/sc220-download/en/sc220-mkii-audio-interface/support/">
+  <meta property="og:title" content="Recording Tech SC220 MKII Support">
+  <meta property="og:description" content="Diagnostic checklist and issue template for SC220, SC220 MKII, SC220 Live, OBS, and karaoke signal paths.">
+  <meta property="og:image" content="https://masarray.github.io/sc220-download/og-sc220-en.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Recording Tech SC220 MKII support and troubleshooting">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="SC220 MKII Support">
+  <meta name="twitter:description" content="Diagnostic checklist, required evidence, and issue template.">
+  <meta name="twitter:image" content="https://masarray.github.io/sc220-download/og-sc220-en.png">
+  <link rel="stylesheet" href="../../../sc220-mkii-p1.css">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@graph":[
+    {"@type":"BreadcrumbList","itemListElement":[
+      {"@type":"ListItem","position":1,"name":"SC220 Live","item":"https://masarray.github.io/sc220-download/en/"},
+      {"@type":"ListItem","position":2,"name":"SC220 MKII","item":"https://masarray.github.io/sc220-download/en/sc220-mkii-audio-interface/"},
+      {"@type":"ListItem","position":3,"name":"Support","item":"https://masarray.github.io/sc220-download/en/sc220-mkii-audio-interface/support/"}
+    ]},
+    {"@type":"FAQPage","mainEntity":[
+      {"@type":"Question","name":"Why does the SC220 not appear in Windows?","acceptedAnswer":{"@type":"Answer","text":"Check the data cable, USB port, power, Device Manager, Windows Sound, and test without a hub. Endpoint names may differ by revision."}},
+      {"@type":"Question","name":"Why is the microphone only on the left?","acceptedAnswer":{"@type":"Answer","text":"A single microphone normally uses one mono channel. Select a mono input or enable mono handling in the destination application."}},
+      {"@type":"Question","name":"Why do I hear echo or doubled audio?","acceptedAnswer":{"@type":"Answer","text":"Direct monitoring and software monitoring may both be active, or the same source may be captured twice."}},
+      {"@type":"Question","name":"Should I download a driver from an unofficial website?","acceptedAnswer":{"@type":"Answer","text":"Do not install an unofficial driver unless its vendor, model, and source can be verified. First record how Windows identifies the device."}}
+    ]}
+  ]}
+  </script>
+</head>
+<body class="p1-page">
+<header class="p1-header">
+  <nav class="p1-nav" aria-label="Support navigation">
+    <a class="p1-brand" href="../../../en/">SC220 <b>LIVE</b></a>
+    <div class="p1-navlinks"><a href="../">Hardware guide</a><a href="../setup/">Setup guide</a><a href="#checklist">Checklist</a><a href="#template">Issue template</a><a href="#faq">FAQ</a></div>
+    <a class="p1-language" href="../../../sc220-mkii-audio-interface/support/" lang="id">Indonesia</a>
+  </nav>
+</header>
+<main>
+<section class="p1-hero">
+  <div class="p1-shell p1-hero-grid">
+    <div>
+      <p class="p1-eyebrow">SC220 MKII SUPPORT</p>
+      <h1>Good diagnosis starts with complete evidence.</h1>
+      <p>Use this page before opening an issue about SC220, SC220 MKII, SC220 Live, OBS, TikTok Live Studio, VB-CABLE, or a karaoke processor. The goal is to separate hardware, Windows, routing, software, and gain-staging problems.</p>
+      <div class="p1-actions"><a class="p1-button primary" href="#checklist">Start diagnosis</a><a class="p1-button secondary" href="https://github.com/masarray/sc220-download/issues/new?template=bug-report.yml">Open bug report</a></div>
+    </div>
+    <aside class="p1-status-card"><small>PRIVACY & SECURITY</small><h2>Do not upload sensitive data.</h2><p>Remove license keys, activation IDs, personal email addresses, unnecessary serial numbers, credentials, and account information from screenshots or logs. Security vulnerabilities belong under SECURITY.md, not a public issue.</p></aside>
+  </div>
+</section>
+<section class="p1-section" id="checklist">
+  <div class="p1-shell">
+    <div class="p1-heading"><h2>Checklist before declaring the device faulty.</h2><p>Change one variable at a time. Record the result of every step so one change does not hide another.</p></div>
+    <div class="p1-support-grid">
+      <article class="p1-checklist"><h2>1. Identity and connection</h2><ul>
+        <li>Photo of the model label: SC220, SC220 MKII, or another name.</li>
+        <li>Front and rear panel photos with port labels visible.</li>
+        <li>USB cable type and whether it supports data.</li>
+        <li>Direct USB port or hub/dock.</li>
+        <li>Source type: dynamic mic, condenser mic, guitar, mixer, or karaoke processor.</li>
+        <li>Complete wiring from source to headphones, speakers, and applications.</li>
+      </ul></article>
+      <article class="p1-checklist"><h2>2. Windows and driver</h2><ul>
+        <li>Windows 10/11 edition, version, and OS build.</li>
+        <li>Device name in Device Manager and Windows Sound.</li>
+        <li>Visible input/output count.</li>
+        <li>Selected sample rate and bit depth.</li>
+        <li>Actual audio API or driver type: Windows audio, WASAPI, or ASIO when available.</li>
+        <li>Whether the device disappears after sleep, reconnect, or a port change.</li>
+      </ul></article>
+      <article class="p1-checklist"><h2>3. Hardware controls</h2><ul>
+        <li>Input 1 and input 2 gain positions.</li>
+        <li>+48 V status and why it is enabled.</li>
+        <li>PAD and Line/Instrument status.</li>
+        <li>Whether the hardware meter moves.</li>
+        <li>Whether headphones/direct monitor produce sound.</li>
+        <li>Whether the problem remains with DSP and other applications closed.</li>
+      </ul></article>
+      <article class="p1-checklist"><h2>4. Software and routing</h2><ul>
+        <li>SC220 Live, OBS, TikTok Live Studio, DAW, or other application versions.</li>
+        <li>Selected input, playback source, and stream output names.</li>
+        <li>Meter screenshots at every stage.</li>
+        <li>Whether the same source is captured twice.</li>
+        <li>Whether exclusive mode or another application is holding the device.</li>
+        <li>Whether the problem starts before or after GO LIVE/stream output.</li>
+      </ul></article>
+    </div>
+  </div>
+</section>
+<section class="p1-section dark">
+  <div class="p1-shell">
+    <div class="p1-heading"><h2>A diagnostic order that avoids guessing.</h2><p>Start with the simplest path and add one component only after the basic result is stable.</p></div>
+    <div class="p1-chain">
+      <article class="p1-stage"><span>1</span><h3>Hardware only</h3><p>Test the microphone or source into the SC220 and listen through direct monitoring/headphones when available.</p></article>
+      <article class="p1-stage"><span>2</span><h3>Windows input</h3><p>Check the endpoint, Windows meter, sample rate, and microphone permissions.</p></article>
+      <article class="p1-stage"><span>3</span><h3>One application</h3><p>Use a single capture application without DSP, virtual cables, or extra monitoring.</p></article>
+      <article class="p1-stage"><span>4</span><h3>SC220 Live</h3><p>Add routing, faders, meters, and stream output only after the base input is proven.</p></article>
+      <article class="p1-stage"><span>5</span><h3>Broadcast chain</h3><p>Add OBS or TikTok, make a test recording, and compare meters with playback.</p></article>
+    </div>
+  </div>
+</section>
+<section class="p1-section" id="template">
+  <div class="p1-shell">
+    <div class="p1-heading"><h2>Issue report template.</h2><p>Copy this into a GitHub issue. Enter “not tested” instead of guessing.</p></div>
+    <div class="p1-template">
+      <pre data-support-template>## Problem summary
+Describe the problem in 1–3 sentences.
+
+## Hardware model
+- Model printed on label:
+- Front/rear panel photos:
+- USB cable type:
+- Direct port / hub:
+
+## Source and wiring
+- Microphone/instrument/processor type:
+- Input used:
+- Mic/Line/Instrument mode:
+- +48 V:
+- PAD:
+- Wiring diagram:
+
+## Windows
+- Edition/version/build:
+- Device Manager name:
+- Windows Sound input/output names:
+- Sample rate / bit depth:
+- Audio driver/API:
+
+## Software
+- SC220 Live version:
+- OBS/TikTok/DAW version:
+- Selected input:
+- Playback source:
+- Stream output:
+
+## Reproduction steps
+1.
+2.
+3.
+
+## Expected result
+
+## Actual result
+
+## Meters and evidence
+- Hardware meter:
+- SC220 Live meter:
+- OBS/application meter:
+- Screenshot/log with private data removed:
+
+## Tests already completed
+- Another cable/port:
+- Without hub:
+- Restart/reconnect:
+- DSP disabled:
+- Direct monitor only:
+- Other applications closed:</pre>
+      <button type="button" data-copy-support-template>Copy template</button><span class="p1-copy-status" data-copy-support-status aria-live="polite"></span>
+    </div>
+  </div>
+</section>
+<section class="p1-section" id="faq">
+  <div class="p1-shell p1-faq">
+    <div class="p1-heading"><h2>Common first-line diagnostic questions.</h2><p>These are starting points. Control labels and driver support must still be checked against the physical unit.</p></div>
+    <details><summary>The SC220 does not appear in Windows. What should I check?</summary><p>Use a proven data cable, try a direct USB port, temporarily avoid hubs, check Device Manager and Windows Sound, then retest after a restart. Record whether it appears as an unknown device or not at all.</p></details>
+    <details><summary>The microphone is only on the left or right.</summary><p>A microphone connected to one input is a mono source. Select a mono channel or enable mono handling in the destination application.</p></details>
+    <details><summary>A condenser microphone has no signal.</summary><p>Confirm that the microphone requires phantom power, the XLR cable is correct, gain is not at minimum, and +48 V is enabled after the cable is connected. Phantom power is not a universal fix for every microphone.</p></details>
+    <details><summary>The audio is echoed or doubled.</summary><p>Disable either direct monitoring or software monitoring. Confirm that the source is not captured directly and again through SC220 Live or a virtual cable.</p></details>
+    <details><summary>The audio clips even when the OBS fader is low.</summary><p>Clipping is probably earlier in the chain. Lower source output or hardware gain, check PAD/line mode, disable extra processing, and inspect meters from input to output.</p></details>
+    <details><summary>Should I install a driver from an unofficial website?</summary><p>Not recommended. Do not install a driver binary that cannot be clearly tied to the vendor and model. Save screenshots of the device identity first and use an official source when one becomes available.</p></details>
+  </div>
+</section>
+<section class="p1-section dark">
+  <div class="p1-shell p1-support-grid">
+    <div><p class="p1-eyebrow">PUBLIC SUPPORT</p><h2>Complete, reproducible issues receive higher priority.</h2><p>This repository provides best-effort support for the installer, landing page, documentation, device detection, routing, and reproducible SC220 Live behavior.</p></div>
+    <div class="p1-actions"><a class="p1-button primary" href="https://github.com/masarray/sc220-download/issues/new?template=bug-report.yml">Open structured bug report</a><a class="p1-button secondary" href="https://github.com/masarray/sc220-download/blob/main/SECURITY.md">Security policy</a></div>
+  </div>
+</section>
+</main>
+<footer class="p1-footer"><div class="p1-shell"><span>© <span data-year>2026</span> MasArray / Recording Tech</span><span><a href="../">SC220 MKII guide</a> · <a href="../setup/">Setup guide</a> · <a href="../../../en/">SC220 Live</a></span></div></footer>
+<script src="../../../app.js" defer></script>
+</body>
+</html>
