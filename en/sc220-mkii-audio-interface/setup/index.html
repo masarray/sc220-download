@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#121313">
+  <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
+  <title>How to Set Up SC220 MKII for Mic, OBS & Karaoke</title>
+  <meta name="description" content="Set up Recording Tech SC220 MKII by goal: microphones, vocals, guitar, podcasting, karaoke processors, OBS, TikTok Live, gain staging, and model identification.">
+  <link rel="canonical" href="https://masarray.github.io/sc220-download/en/sc220-mkii-audio-interface/setup/">
+  <link rel="alternate" hreflang="id" href="https://masarray.github.io/sc220-download/sc220-mkii-audio-interface/setup/">
+  <link rel="alternate" hreflang="en" href="https://masarray.github.io/sc220-download/en/sc220-mkii-audio-interface/setup/">
+  <link rel="alternate" hreflang="x-default" href="https://masarray.github.io/sc220-download/sc220-mkii-audio-interface/setup/">
+  <link rel="icon" href="../../../favicon.svg" type="image/svg+xml">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="SC220 Live">
+  <meta property="og:url" content="https://masarray.github.io/sc220-download/en/sc220-mkii-audio-interface/setup/">
+  <meta property="og:title" content="How to Set Up Recording Tech SC220 MKII">
+  <meta property="og:description" content="Choose your goal, build proper gain staging, connect a microphone, instrument, or karaoke processor, and prepare OBS or live streaming.">
+  <meta property="og:image" content="https://masarray.github.io/sc220-download/og-sc220-en.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Recording Tech SC220 MKII setup guide">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="How to Set Up SC220 MKII">
+  <meta name="twitter:description" content="Goal-based setup, gain staging, wiring, OBS, and first-line troubleshooting.">
+  <meta name="twitter:image" content="https://masarray.github.io/sc220-download/og-sc220-en.png">
+  <link rel="stylesheet" href="../../../sc220-mkii-p1.css">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@graph":[
+    {"@type":"BreadcrumbList","itemListElement":[
+      {"@type":"ListItem","position":1,"name":"SC220 Live","item":"https://masarray.github.io/sc220-download/en/"},
+      {"@type":"ListItem","position":2,"name":"SC220 MKII","item":"https://masarray.github.io/sc220-download/en/sc220-mkii-audio-interface/"},
+      {"@type":"ListItem","position":3,"name":"Setup Guide","item":"https://masarray.github.io/sc220-download/en/sc220-mkii-audio-interface/setup/"}
+    ]},
+    {"@type":"HowTo","name":"How to set up Recording Tech SC220 MKII","description":"A goal-based guide to input modes, gain, monitoring, and software routing.","inLanguage":"en-US","step":[
+      {"@type":"HowToStep","name":"Identify the model and signal path","text":"Check the device label, source, cable, and destination application before enabling phantom power or raising gain."},
+      {"@type":"HowToStep","name":"Choose the input mode","text":"Use microphone, line, or instrument mode for the source type. Enable phantom power only when the microphone requires it."},
+      {"@type":"HowToStep","name":"Set hardware gain","text":"Start low, raise the gain until the signal is healthy, and avoid clipping at the first stage."},
+      {"@type":"HowToStep","name":"Set the software mix","text":"Use SC220 Live or another mixer only after the hardware input is clean and stable."},
+      {"@type":"HowToStep","name":"Verify broadcast output","text":"Make a short test recording in OBS or the destination application and listen back before going live."}
+    ]}
+  ]}
+  </script>
+</head>
+<body class="p1-page">
+<header class="p1-header">
+  <nav class="p1-nav" aria-label="Guide navigation">
+    <a class="p1-brand" href="../../../en/">SC220 <b>LIVE</b></a>
+    <div class="p1-navlinks"><a href="../">Hardware guide</a><a href="#goals">Choose a goal</a><a href="#gain">Gain staging</a><a href="#model">Identify model</a><a href="../support/">Support</a></div>
+    <a class="p1-language" href="../../../sc220-mkii-audio-interface/setup/" lang="id">Indonesia</a>
+  </nav>
+</header>
+<main>
+<section class="p1-hero">
+  <div class="p1-shell p1-hero-grid">
+    <div>
+      <p class="p1-eyebrow">SC220 MKII SETUP GUIDE</p>
+      <h1>Set up the SC220 MKII for what you actually want to do.</h1>
+      <p>Start with the correct signal path instead of turning up every knob. This guide separates hardware gain, monitoring, the SC220 Live mix, and the final OBS level so clipping, weak signal, echo, or one-sided audio can be diagnosed faster.</p>
+      <div class="p1-actions"><a class="p1-button primary" href="#goals">Choose my use case</a><a class="p1-button secondary" href="../support/">Open support checklist</a></div>
+    </div>
+    <aside class="p1-status-card"><small>COMPATIBILITY STATUS</small><h2>Test hardware and software separately.</h2><p>Do not assume every device sold as SC220 has the same driver, channel map, sample rates, loopback, or Windows endpoint names. SC220 Live compatibility with the MKII still requires a physical-unit test.</p></aside>
+  </div>
+</section>
+<section class="p1-section" id="goals">
+  <div class="p1-shell">
+    <div class="p1-heading"><h2>I want to use the SC220 MKII for…</h2><p>Choose the closest goal. Every route starts with the source, input mode, hardware gain, monitoring, and only then software.</p></div>
+    <div class="p1-goals">
+      <a class="p1-goal" href="#vocal"><small>01 · MICROPHONE</small><h3>Record vocals</h3><p>Dynamic or condenser microphones, phantom power, mono input, and recording level.</p></a>
+      <a class="p1-goal" href="#stream"><small>02 · STREAMING</small><h3>OBS / TikTok Live</h3><p>Input capture, SC220 Live, VB-CABLE, monitoring, and pre-live checks.</p></a>
+      <a class="p1-goal" href="#podcast"><small>03 · TWO PEOPLE</small><h3>Two-mic podcast</h3><p>Inputs 1 and 2, separate gain, monitoring, and channel handling.</p></a>
+      <a class="p1-goal" href="#instrument"><small>04 · INSTRUMENT</small><h3>Guitar or bass</h3><p>Jack input, instrument mode, pickup level, and monitoring without echo.</p></a>
+      <a class="p1-goal" href="#karaoke"><small>05 · LINE SOURCE</small><h3>Karaoke processor</h3><p>Processor L/R outputs, line input, PAD when needed, and neutral gain.</p></a>
+      <a class="p1-goal" href="#mobile"><small>06 · USB OTG</small><h3>Phone or tablet</h3><p>Cables, power, apps, and compatibility limits that must be tested.</p></a>
+    </div>
+  </div>
+</section>
+<section class="p1-section dark" id="gain">
+  <div class="p1-shell">
+    <div class="p1-heading"><h2>Gain staging: fix level at the earliest stage.</h2><p>A software fader cannot repair an analog input that is already clipping. The monitor knob is not input gain.</p></div>
+    <div class="p1-chain">
+      <article class="p1-stage"><span>1</span><h3>Source</h3><p>Microphone, guitar, mixer, or karaoke processor. Know the source type and approximate level.</p></article>
+      <article class="p1-stage"><span>2</span><h3>Input mode</h3><p>Select mic, line, or instrument. Enable +48 V only when required. Use PAD when a line source remains too strong.</p></article>
+      <article class="p1-stage"><span>3</span><h3>Hardware gain</h3><p>Start low, raise it while watching the meter, and leave room for the loudest moment.</p></article>
+      <article class="p1-stage"><span>4</span><h3>Software mix</h3><p>Set faders, mute, ducking, or DSP only after the hardware signal is clean and stable.</p></article>
+      <article class="p1-stage"><span>5</span><h3>Broadcast</h3><p>Use OBS or destination faders for final adjustment, then make a short test recording.</p></article>
+    </div>
+    <div class="p1-callout"><strong>Diagnostic order:</strong> disable DSP and duplicate monitoring, test one source, check the input meter, check the mix meter, then check OBS. Do not raise several stages at once.</div>
+  </div>
+</section>
+<section class="p1-section">
+  <div class="p1-shell">
+    <div class="p1-heading"><h2>Connection routes by use case.</h2><p>Button names and endpoint labels may vary by revision. Match the chassis label and the name that actually appears in Windows.</p></div>
+    <div class="p1-routes">
+      <article class="p1-route" id="vocal"><small>VOCAL RECORDING</small><h3>Dynamic or condenser microphone</h3><ol><li>Lower gain and monitor level.</li><li>Connect the microphone through XLR.</li><li>For a condenser that requires phantom power, enable +48 V after connecting the cable.</li><li>Select a mono input so the vocal does not appear only on one side.</li><li>Raise gain while performing the loudest section, then record a test.</li></ol><div class="signal">MIC → XLR INPUT → HARDWARE GAIN → DAW / SC220 LIVE</div></article>
+      <article class="p1-route" id="stream"><small>LIVE STREAMING</small><h3>OBS or TikTok Live Studio</h3><ol><li>Confirm the SC220 is visible and its input meter moves.</li><li>Select it as the source in SC220 Live or the capture application.</li><li>When using SC220 Live, select the correct stream output.</li><li>Choose the matching receiving endpoint in OBS or TikTok.</li><li>Avoid capturing the same source twice.</li></ol><div class="signal">SC220 → SC220 LIVE → STREAM OUTPUT → OBS / TIKTOK</div></article>
+      <article class="p1-route" id="podcast"><small>TWO-MIC PODCAST</small><h3>Two microphones, two gain controls</h3><ol><li>Connect the first microphone to input 1 and the second to input 2.</li><li>Set gain separately for each speaker.</li><li>Confirm the application maps both channels as intended.</li><li>Use headphones to check noise, bleed, and level differences.</li><li>Do not enable phantom power without checking each microphone requirement.</li></ol><div class="signal">MIC 1 → INPUT 1 + MIC 2 → INPUT 2 → APP</div></article>
+      <article class="p1-route" id="instrument"><small>GUITAR / BASS</small><h3>Instrument mode</h3><ol><li>Connect the instrument with a 6.35 mm cable.</li><li>Select instrument mode when available on that input.</li><li>Start with low gain and play the loudest section.</li><li>Choose direct monitoring or software monitoring, not both.</li><li>Add amp simulation after the input is clean.</li></ol><div class="signal">GUITAR / BASS → INST INPUT → GAIN → APP</div></article>
+      <article class="p1-route" id="karaoke"><small>KARAOKE PROCESSOR</small><h3>Treat it as a line source</h3><ol><li>Connect processor L/R outputs to two inputs for stereo.</li><li>Select line mode, not instrument mode.</li><li>Start with low processor output and interface gain.</li><li>Use PAD if the level remains too strong.</li><li>Check for stacked processing that causes pumping or distortion.</li></ol><div class="signal">PROCESSOR L/R → LINE INPUT 1/2 → SC220 LIVE → OBS</div></article>
+      <article class="p1-route" id="mobile"><small>USB OTG</small><h3>Phone or tablet</h3><ol><li>Use a data-capable cable or adapter, not charge-only.</li><li>Check whether the mobile device can provide enough power.</li><li>Select the SC220 in the audio application when available.</li><li>Test input, output, monitoring, and long-session behavior.</li><li>Use a powered hub only when needed and appropriate for the devices.</li></ol><div class="signal">SC220 USB-C → OTG ADAPTER → MOBILE APP</div></article>
+    </div>
+  </div>
+</section>
+<section class="p1-section" id="model">
+  <div class="p1-shell">
+    <div class="p1-heading"><h2>SC220 vs SC220 MKII: identify before comparing.</h2><p>A generic store title or Windows endpoint name does not prove that two revisions have identical specifications or behavior.</p></div>
+    <div class="p1-table-wrap"><table class="p1-table"><thead><tr><th>Check</th><th>What is reliable</th><th>What must not be assumed</th><th>Status</th></tr></thead><tbody>
+      <tr><td>Chassis or package label</td><td>The model and revision printed on the product.</td><td>Complete specifications without a datasheet.</td><td><span class="p1-badge known">Use as identity</span></td></tr>
+      <tr><td>Front and rear panel photos</td><td>Connector count, control labels, and physical layout.</td><td>Drivers, latency, preamp performance, or loopback.</td><td><span class="p1-badge known">Visual evidence</span></td></tr>
+      <tr><td>Windows device name</td><td>The endpoint detected on that particular PC.</td><td>That every batch or revision uses the same endpoint.</td><td><span class="p1-badge check">Record during test</span></td></tr>
+      <tr><td>Retail listing</td><td>The product claims currently published by the seller.</td><td>Measured performance or universal compatibility.</td><td><span class="p1-badge check">Needs confirmation</span></td></tr>
+      <tr><td>SC220 Live</td><td>A Windows routing and mixing application as documented.</td><td>MKII support before endpoint and channel-map testing.</td><td><span class="p1-badge unknown">Unverified</span></td></tr>
+    </tbody></table></div>
+  </div>
+</section>
+<section class="p1-section dark">
+  <div class="p1-shell p1-support-grid">
+    <div><p class="p1-eyebrow">BEFORE OPENING AN ISSUE</p><h2>Provide evidence so support does not have to guess.</h2><p>A model photo, Windows device name, input mode, sample rate, wiring, meter screenshot, and reproduction steps are more useful than “there is no sound”.</p></div>
+    <div class="p1-actions"><a class="p1-button primary" href="../support/">Open SC220 MKII support page</a><a class="p1-button secondary" href="https://github.com/masarray/sc220-download/issues">View GitHub Issues</a></div>
+  </div>
+</section>
+</main>
+<footer class="p1-footer"><div class="p1-shell"><span>© <span data-year>2026</span> MasArray / Recording Tech</span><span><a href="../">SC220 MKII guide</a> · <a href="../support/">Support</a> · <a href="../../../en/">SC220 Live</a></span></div></footer>
+<script src="../../../app.js" defer></script>
+</body>
+</html>

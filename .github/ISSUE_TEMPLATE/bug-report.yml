@@ -1,5 +1,5 @@
 name: Bug report
-description: Report a reproducible SC220 Live, installer, routing, or public-site problem.
+description: Report a reproducible SC220 Live, SC220 hardware, installer, routing, or public-site problem.
 title: "[Bug]: "
 labels:
   - bug
@@ -7,21 +7,45 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for reporting a problem. Remove license data, credentials, personal information, and security-sensitive details before submitting.
+        Thanks for reporting a problem. Remove license data, credentials, personal information, unnecessary serial numbers, and security-sensitive details before submitting.
+        For hardware and routing issues, complete the SC220 MKII support checklist first: https://masarray.github.io/sc220-download/sc220-mkii-audio-interface/support/
 
   - type: dropdown
     id: area
     attributes:
       label: Affected area
       options:
+        - SC220 / SC220 MKII hardware compatibility
         - Application startup or crash
-        - Audio device detection
-        - Input or PC audio routing
-        - Meters, faders, mute, or ducking
+        - Audio device detection or reconnect
+        - Input, channel mapping, or PC audio routing
+        - Meters, faders, mute, DSP, or ducking
         - Stream output / virtual audio cable
+        - OBS or TikTok Live Studio integration
         - Installer or release integrity
         - Landing page or documentation
         - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: hardware_model
+    attributes:
+      label: Hardware model
+      description: Select the closest option and enter the exact printed label below.
+      options:
+        - Recording Tech SC220
+        - Recording Tech SC220 MKII / MK2
+        - Another audio interface
+        - Unknown / no hardware involved
+    validations:
+      required: true
+
+  - type: input
+    id: printed_model
+    attributes:
+      label: Exact model printed on the device or package
+      placeholder: e.g. Recording Tech SC220 MKII; write Not applicable when no hardware is involved
     validations:
       required: true
 
@@ -29,7 +53,7 @@ body:
     id: version
     attributes:
       label: SC220 Live version
-      placeholder: e.g. v0.1.0
+      placeholder: e.g. v0.1.0 or Not applicable
     validations:
       required: true
 
@@ -41,19 +65,50 @@ body:
     validations:
       required: true
 
-  - type: input
-    id: hardware
+  - type: textarea
+    id: endpoints
     attributes:
-      label: Audio hardware and driver
-      placeholder: e.g. Recording Tech SC220, WASAPI shared
+      label: Windows device identity and audio format
+      description: Copy the exact names shown in Device Manager and Windows Sound.
+      placeholder: |
+        Device Manager name:
+        Input endpoint name:
+        Output endpoint name:
+        Visible input/output channels:
+        Sample rate / bit depth:
+        Audio API or driver (Windows audio / WASAPI / ASIO / unknown):
     validations:
       required: true
 
-  - type: input
-    id: streaming_app
+  - type: textarea
+    id: source_wiring
     attributes:
-      label: Streaming application
-      placeholder: e.g. OBS Studio 32.x or TikTok Live Studio
+      label: Source, controls, and complete wiring
+      placeholder: |
+        Source type (dynamic mic / condenser mic / guitar / mixer / processor):
+        Input number and connector:
+        Mic / Line / Instrument mode:
+        +48 V status:
+        PAD status:
+        USB cable and direct port / hub / dock:
+        Complete signal path from source to destination:
+    validations:
+      required: true
+
+  - type: textarea
+    id: software_routing
+    attributes:
+      label: Software and routing selections
+      placeholder: |
+        Streaming or recording application and version:
+        Selected hardware input:
+        Selected playback source:
+        Selected stream output:
+        Direct monitoring enabled:
+        Software monitoring enabled:
+        Does the problem start before or after GO LIVE / stream output?
+    validations:
+      required: true
 
   - type: textarea
     id: steps
@@ -61,9 +116,9 @@ body:
       label: Steps to reproduce
       description: Provide the shortest reliable sequence that reproduces the problem.
       placeholder: |
-        1. Open SC220 Live
-        2. Select ...
-        3. Enable ...
+        1. Connect ...
+        2. Open ...
+        3. Select ...
         4. Observe ...
     validations:
       required: true
@@ -83,21 +138,29 @@ body:
       required: true
 
   - type: textarea
-    id: evidence
+    id: meters_evidence
     attributes:
-      label: Screenshots or sanitized logs
-      description: Drag files here. Remove personal information, activation data, and credentials.
+      label: Meter results, screenshots, or sanitized logs
+      description: State which meters move and drag supporting files here. Remove personal information, activation data, credentials, and unnecessary serial numbers.
+      placeholder: |
+        Hardware meter:
+        Windows meter:
+        SC220 Live meter:
+        OBS / destination meter:
+        Screenshot or log:
 
   - type: checkboxes
     id: checks
     attributes:
       label: Pre-submission checks
       options:
-        - label: I downloaded SC220 Live from the official GitHub Releases page.
+        - label: I downloaded SC220 Live from the official GitHub Releases page, or this report does not involve the installer.
           required: true
-        - label: I verified the installer checksum or confirmed this is not an installer issue.
+        - label: I tested a simple hardware → Windows → one application path before adding extra DSP, virtual cables, or broadcast routing.
           required: true
-        - label: I restarted the application and affected audio devices.
+        - label: I checked for duplicate direct/software monitoring and duplicate source capture.
           required: true
-        - label: This report does not contain a security vulnerability or sensitive data.
+        - label: I restarted or reconnected the affected applications and audio devices.
+          required: true
+        - label: This report does not contain a security vulnerability, credentials, license data, or other sensitive information.
           required: true

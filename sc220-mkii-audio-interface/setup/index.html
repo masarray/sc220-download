@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#121313">
+  <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
+  <title>Cara Setting SC220 MKII untuk Mic, OBS & Karaoke</title>
+  <meta name="description" content="Cara setting Recording Tech SC220 MKII berdasarkan tujuan: microphone, vocal, gitar, podcast, karaoke processor, OBS, TikTok Live, gain staging dan identifikasi model.">
+  <link rel="canonical" href="https://masarray.github.io/sc220-download/sc220-mkii-audio-interface/setup/">
+  <link rel="alternate" hreflang="id" href="https://masarray.github.io/sc220-download/sc220-mkii-audio-interface/setup/">
+  <link rel="alternate" hreflang="en" href="https://masarray.github.io/sc220-download/en/sc220-mkii-audio-interface/setup/">
+  <link rel="alternate" hreflang="x-default" href="https://masarray.github.io/sc220-download/sc220-mkii-audio-interface/setup/">
+  <link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="SC220 Live">
+  <meta property="og:url" content="https://masarray.github.io/sc220-download/sc220-mkii-audio-interface/setup/">
+  <meta property="og:title" content="Cara Setting Recording Tech SC220 MKII">
+  <meta property="og:description" content="Pilih tujuan Anda, susun gain staging, hubungkan microphone, gitar atau karaoke processor, lalu siapkan OBS dan live streaming.">
+  <meta property="og:image" content="https://masarray.github.io/sc220-download/og-sc220-id.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Panduan cara setting Recording Tech SC220 MKII">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Cara Setting SC220 MKII">
+  <meta name="twitter:description" content="Panduan tujuan, gain staging, wiring, OBS dan troubleshooting awal.">
+  <meta name="twitter:image" content="https://masarray.github.io/sc220-download/og-sc220-id.png">
+  <link rel="stylesheet" href="../../sc220-mkii-p1.css">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@graph":[
+    {"@type":"BreadcrumbList","itemListElement":[
+      {"@type":"ListItem","position":1,"name":"SC220 Live","item":"https://masarray.github.io/sc220-download/"},
+      {"@type":"ListItem","position":2,"name":"SC220 MKII","item":"https://masarray.github.io/sc220-download/sc220-mkii-audio-interface/"},
+      {"@type":"ListItem","position":3,"name":"Cara Setting","item":"https://masarray.github.io/sc220-download/sc220-mkii-audio-interface/setup/"}
+    ]},
+    {"@type":"HowTo","name":"Cara setting Recording Tech SC220 MKII","description":"Panduan memilih mode input, mengatur gain, monitoring dan routing berdasarkan tujuan penggunaan.","inLanguage":"id-ID","step":[
+      {"@type":"HowToStep","name":"Pastikan model dan jalur sinyal","text":"Periksa label perangkat, sumber audio, kabel, dan aplikasi tujuan sebelum menyalakan phantom power atau menaikkan gain."},
+      {"@type":"HowToStep","name":"Pilih mode input","text":"Gunakan microphone, line, atau instrument sesuai jenis sumber. Gunakan phantom power hanya ketika microphone membutuhkannya."},
+      {"@type":"HowToStep","name":"Atur gain hardware","text":"Mulai dari rendah, naikkan sampai sinyal sehat, dan hindari clipping pada tahap pertama."},
+      {"@type":"HowToStep","name":"Atur mix software","text":"Gunakan fader SC220 Live atau aplikasi lain setelah input hardware bersih dan stabil."},
+      {"@type":"HowToStep","name":"Periksa output siaran","text":"Rekam tes pendek di OBS atau aplikasi tujuan dan dengarkan kembali sebelum live."}
+    ]}
+  ]}
+  </script>
+</head>
+<body class="p1-page">
+<header class="p1-header">
+  <nav class="p1-nav" aria-label="Navigasi panduan">
+    <a class="p1-brand" href="../../">SC220 <b>LIVE</b></a>
+    <div class="p1-navlinks"><a href="../">Panduan hardware</a><a href="#tujuan">Pilih tujuan</a><a href="#gain">Gain staging</a><a href="#model">Cek model</a><a href="../support/">Support</a></div>
+    <a class="p1-language" href="../../en/sc220-mkii-audio-interface/setup/" lang="en">English</a>
+  </nav>
+</header>
+<main>
+<section class="p1-hero">
+  <div class="p1-shell p1-hero-grid">
+    <div>
+      <p class="p1-eyebrow">SC220 MKII SETUP GUIDE</p>
+      <h1>Cara setting SC220 MKII berdasarkan tujuan Anda.</h1>
+      <p>Mulai dari jalur sinyal yang benar, bukan dari menaikkan semua knob. Panduan ini memisahkan gain hardware, monitoring, mix SC220 Live, dan level akhir di OBS agar masalah clipping, suara kecil, echo, atau kanal kiri dapat ditemukan lebih cepat.</p>
+      <div class="p1-actions"><a class="p1-button primary" href="#tujuan">Pilih kebutuhan saya</a><a class="p1-button secondary" href="../support/">Buka checklist support</a></div>
+    </div>
+    <aside class="p1-status-card"><small>STATUS KOMPATIBILITAS</small><h2>Hardware dan software harus diuji terpisah.</h2><p>Jangan menganggap semua unit yang bernama SC220 memiliki driver, channel map, sample rate, loopback, atau endpoint Windows yang sama. Kompatibilitas SC220 Live dengan MKII tetap harus dikonfirmasi menggunakan unit fisik.</p></aside>
+  </div>
+</section>
+<section class="p1-section" id="tujuan">
+  <div class="p1-shell">
+    <div class="p1-heading"><h2>Saya ingin menggunakan SC220 MKII untuk…</h2><p>Pilih tujuan terdekat. Setiap jalur dimulai dari sumber, mode input, gain hardware, monitoring, kemudian software.</p></div>
+    <div class="p1-goals">
+      <a class="p1-goal" href="#vocal"><small>01 · MICROPHONE</small><h3>Merekam vocal</h3><p>Dynamic atau condenser microphone, phantom power, mono input, dan level rekaman.</p></a>
+      <a class="p1-goal" href="#stream"><small>02 · STREAMING</small><h3>OBS / TikTok Live</h3><p>Capture input, SC220 Live, VB-CABLE, monitoring, dan tes sebelum live.</p></a>
+      <a class="p1-goal" href="#podcast"><small>03 · DUA ORANG</small><h3>Podcast dua microphone</h3><p>Input 1 dan 2, gain terpisah, monitoring, dan pengaturan kanal.</p></a>
+      <a class="p1-goal" href="#instrument"><small>04 · INSTRUMENT</small><h3>Gitar atau bass</h3><p>Input jack, mode instrument, level pickup, dan monitoring tanpa echo.</p></a>
+      <a class="p1-goal" href="#karaoke"><small>05 · LINE SOURCE</small><h3>Karaoke processor</h3><p>Output L/R processor, line input, PAD bila diperlukan, dan gain netral.</p></a>
+      <a class="p1-goal" href="#mobile"><small>06 · USB OTG</small><h3>Smartphone / tablet</h3><p>Kabel, daya, aplikasi, dan batas kompatibilitas yang wajib diuji.</p></a>
+    </div>
+  </div>
+</section>
+<section class="p1-section dark" id="gain">
+  <div class="p1-shell">
+    <div class="p1-heading"><h2>Gain staging: perbaiki level dari tahap paling awal.</h2><p>Fader software tidak dapat memperbaiki input analog yang sudah clipping. Monitor knob juga bukan input gain.</p></div>
+    <div class="p1-chain">
+      <article class="p1-stage"><span>1</span><h3>Sumber</h3><p>Microphone, gitar, mixer, atau karaoke processor. Pastikan jenis dan level sumber diketahui.</p></article>
+      <article class="p1-stage"><span>2</span><h3>Mode input</h3><p>Pilih mic, line, atau instrument. Aktifkan +48 V hanya bila microphone memang memerlukannya. Gunakan PAD ketika sumber line terlalu kuat.</p></article>
+      <article class="p1-stage"><span>3</span><h3>Gain hardware</h3><p>Mulai rendah, naikkan sambil memantau meter, dan sisakan ruang aman untuk bagian paling keras.</p></article>
+      <article class="p1-stage"><span>4</span><h3>Mix software</h3><p>Atur fader, mute, ducking, atau DSP setelah sinyal hardware bersih dan stabil.</p></article>
+      <article class="p1-stage"><span>5</span><h3>Broadcast</h3><p>Gunakan fader OBS atau aplikasi tujuan sebagai penyesuaian akhir, kemudian rekam tes pendek.</p></article>
+    </div>
+    <div class="p1-callout"><strong>Urutan diagnosis:</strong> matikan DSP dan monitoring ganda, uji satu sumber, cek meter input, cek meter mix, lalu cek meter OBS. Jangan menaikkan beberapa tahap sekaligus.</div>
+  </div>
+</section>
+<section class="p1-section">
+  <div class="p1-shell">
+    <div class="p1-heading"><h2>Rute pemasangan berdasarkan penggunaan.</h2><p>Nama tombol dan endpoint dapat berbeda antar revisi. Cocokkan dengan label unit dan nama yang benar-benar muncul di Windows.</p></div>
+    <div class="p1-routes">
+      <article class="p1-route" id="vocal"><small>VOCAL RECORDING</small><h3>Dynamic atau condenser microphone</h3><ol><li>Turunkan gain dan monitor level.</li><li>Hubungkan microphone melalui XLR.</li><li>Untuk condenser yang membutuhkan phantom, aktifkan +48 V setelah kabel terpasang.</li><li>Pilih input mono di aplikasi agar vocal tidak hanya muncul di kiri atau kanan.</li><li>Naikkan gain sambil menyanyikan bagian paling keras, lalu rekam tes.</li></ol><div class="signal">MIC → XLR INPUT → HARDWARE GAIN → DAW / SC220 LIVE</div></article>
+      <article class="p1-route" id="stream"><small>LIVE STREAMING</small><h3>OBS atau TikTok Live Studio</h3><ol><li>Pastikan SC220 terlihat dan meter input bergerak.</li><li>Pilih SC220 sebagai sumber di SC220 Live atau aplikasi capture.</li><li>Jika memakai SC220 Live, pilih stream output yang benar.</li><li>Di OBS/TikTok, pilih endpoint penerima yang sesuai.</li><li>Hindari menangkap sumber yang sama dua kali.</li></ol><div class="signal">SC220 → SC220 LIVE → STREAM OUTPUT → OBS / TIKTOK</div></article>
+      <article class="p1-route" id="podcast"><small>TWO-MIC PODCAST</small><h3>Dua microphone, dua gain</h3><ol><li>Hubungkan microphone pertama ke input 1 dan kedua ke input 2.</li><li>Atur gain tiap pembicara secara terpisah.</li><li>Pastikan aplikasi membaca kedua kanal sesuai kebutuhan mono/stereo.</li><li>Gunakan headphone untuk memeriksa noise, bleed, dan perbedaan volume.</li><li>Jangan menyalakan phantom untuk seluruh jalur tanpa memeriksa kebutuhan microphone.</li></ol><div class="signal">MIC 1 → INPUT 1 + MIC 2 → INPUT 2 → APP</div></article>
+      <article class="p1-route" id="instrument"><small>GUITAR / BASS</small><h3>Mode instrument</h3><ol><li>Hubungkan instrumen menggunakan jack 6,35 mm.</li><li>Pilih mode instrument bila tersedia pada input tersebut.</li><li>Mulai gain rendah dan mainkan bagian paling keras.</li><li>Pilih direct monitor atau software monitor, bukan keduanya sekaligus.</li><li>Tambahkan amp simulation setelah sinyal bersih.</li></ol><div class="signal">GUITAR / BASS → INST INPUT → GAIN → APP</div></article>
+      <article class="p1-route" id="karaoke"><small>KARAOKE PROCESSOR</small><h3>Masuk sebagai line source</h3><ol><li>Hubungkan output L/R processor ke dua input untuk stereo.</li><li>Pilih line mode, bukan instrument.</li><li>Mulai output processor dan gain interface dari rendah.</li><li>Gunakan PAD bila level tetap terlalu kuat.</li><li>Pastikan tidak ada processing ganda yang menyebabkan pumping atau distorsi.</li></ol><div class="signal">PROCESSOR L/R → LINE INPUT 1/2 → SC220 LIVE → OBS</div></article>
+      <article class="p1-route" id="mobile"><small>USB OTG</small><h3>Smartphone atau tablet</h3><ol><li>Gunakan kabel atau adapter data, bukan kabel charge-only.</li><li>Periksa apakah perangkat mobile dapat memberi daya yang cukup.</li><li>Pilih SC220 di aplikasi audio bila tersedia.</li><li>Uji input, output, monitoring, dan durasi penggunaan.</li><li>Gunakan powered hub hanya bila dibutuhkan dan sesuai spesifikasi perangkat.</li></ol><div class="signal">SC220 USB-C → OTG ADAPTER → MOBILE APP</div></article>
+    </div>
+  </div>
+</section>
+<section class="p1-section" id="model">
+  <div class="p1-shell">
+    <div class="p1-heading"><h2>SC220 vs SC220 MKII: identifikasi sebelum menyimpulkan.</h2><p>Nama generik pada listing atau endpoint Windows bukan bukti bahwa dua revisi memiliki spesifikasi dan perilaku yang identik.</p></div>
+    <div class="p1-table-wrap"><table class="p1-table"><thead><tr><th>Pemeriksaan</th><th>Yang dapat dipercaya</th><th>Yang belum boleh diasumsikan</th><th>Status</th></tr></thead><tbody>
+      <tr><td>Label pada chassis/kemasan</td><td>Nama model dan revisi yang tercetak langsung.</td><td>Spesifikasi lengkap tanpa datasheet.</td><td><span class="p1-badge known">Gunakan sebagai identitas</span></td></tr>
+      <tr><td>Foto panel depan/belakang</td><td>Jumlah konektor, label tombol, dan layout fisik.</td><td>Driver, latency, kualitas preamp, atau loopback.</td><td><span class="p1-badge known">Bukti visual</span></td></tr>
+      <tr><td>Nama di Windows</td><td>Endpoint yang benar-benar terdeteksi pada PC tersebut.</td><td>Bahwa endpoint sama pada semua batch atau revisi.</td><td><span class="p1-badge check">Catat saat pengujian</span></td></tr>
+      <tr><td>Listing toko</td><td>Klaim produk yang sedang dipublikasikan penjual.</td><td>Nilai teknis terukur atau kompatibilitas universal.</td><td><span class="p1-badge check">Perlu konfirmasi</span></td></tr>
+      <tr><td>SC220 Live</td><td>Software Windows untuk routing dan mixing sesuai dokumentasi aplikasi.</td><td>Dukungan MKII sebelum endpoint dan channel map diuji.</td><td><span class="p1-badge unknown">Belum terverifikasi</span></td></tr>
+    </tbody></table></div>
+  </div>
+</section>
+<section class="p1-section dark">
+  <div class="p1-shell p1-support-grid">
+    <div><p class="p1-eyebrow">SEBELUM MEMBUKA ISSUE</p><h2>Siapkan data agar diagnosis tidak menebak-nebak.</h2><p>Foto model, nama device Windows, mode input, sample rate, wiring, screenshot meter, dan langkah reproduksi jauh lebih berguna daripada laporan “suara tidak keluar”.</p></div>
+    <div class="p1-actions"><a class="p1-button primary" href="../support/">Buka halaman support SC220 MKII</a><a class="p1-button secondary" href="https://github.com/masarray/sc220-download/issues">Lihat GitHub Issues</a></div>
+  </div>
+</section>
+</main>
+<footer class="p1-footer"><div class="p1-shell"><span>© <span data-year>2026</span> MasArray / Recording Tech</span><span><a href="../">Panduan SC220 MKII</a> · <a href="../support/">Support</a> · <a href="../../">SC220 Live</a></span></div></footer>
+<script src="../../app.js" defer></script>
+</body>
+</html>

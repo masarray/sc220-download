@@ -14,8 +14,8 @@
   const releaseSource = html.dataset.releaseSource || "latest.json";
 
   const copyLabels = isEnglish
-    ? { idle: "Copy", done: "Copied" }
-    : { idle: "Salin", done: "Tersalin" };
+    ? { idle: "Copy", done: "Copied", templateDone: "Template copied" }
+    : { idle: "Salin", done: "Tersalin", templateDone: "Template tersalin" };
 
   const formatDate = (value) => {
     if (!value) return "";
@@ -39,19 +39,15 @@
     document.querySelectorAll("[data-version]").forEach((node) => {
       node.textContent = versionLabel;
     });
-
     document.querySelectorAll("[data-published]").forEach((node) => {
       node.textContent = published;
     });
-
     document.querySelectorAll("[data-download-link]").forEach((node) => {
       node.href = download;
     });
-
     document.querySelectorAll("[data-release-link]").forEach((node) => {
       node.href = releaseUrl;
     });
-
     document.querySelectorAll("[data-sha]").forEach((node) => {
       node.textContent = sha256;
     });
@@ -101,22 +97,26 @@
     }
   });
 
+  const ensureStylesheet = (href) => {
+    if (document.querySelector(`link[href="${href}"]`)) return;
+    const stylesheet = document.createElement("link");
+    stylesheet.rel = "stylesheet";
+    stylesheet.href = href;
+    document.head.appendChild(stylesheet);
+  };
+
   const installHardwareGuidePromo = () => {
     const path = window.location.pathname.replace(/\/+$/, "/");
     const isLandingPage = /\/sc220-download\/(?:en\/)?$/.test(path);
     if (!isLandingPage || document.querySelector(".hardware-guide-section")) return;
 
-    const guideHref = isEnglish
-      ? "sc220-mkii-audio-interface/"
-      : "sc220-mkii-audio-interface/";
+    const guideHref = "sc220-mkii-audio-interface/";
+    const setupHref = "sc220-mkii-audio-interface/setup/";
+    const supportHref = "sc220-mkii-audio-interface/support/";
     const stylesheetHref = isEnglish ? "../sc220-mkii.css" : "sc220-mkii.css";
-
-    if (!document.querySelector(`link[href="${stylesheetHref}"]`)) {
-      const stylesheet = document.createElement("link");
-      stylesheet.rel = "stylesheet";
-      stylesheet.href = stylesheetHref;
-      document.head.appendChild(stylesheet);
-    }
+    const p1StylesheetHref = isEnglish ? "../sc220-mkii-p1.css" : "sc220-mkii-p1.css";
+    ensureStylesheet(stylesheetHref);
+    ensureStylesheet(p1StylesheetHref);
 
     const nav = document.querySelector(".desktop-nav");
     if (nav && !nav.querySelector("[data-sc220-mkii-link]")) {
@@ -132,8 +132,8 @@
     section.className = "hardware-guide-section";
     section.setAttribute("aria-labelledby", "sc220-mkii-guide-title");
     section.innerHTML = isEnglish
-      ? `<div class="hardware-guide-shell"><div><p class="kicker dark"><span></span> SC220 MKII HARDWARE GUIDE</p><h2 id="sc220-mkii-guide-title">Understand the interface before connecting it.</h2><p>Read public specifications, control functions, microphone and karaoke-processor wiring, a compatibility matrix, OBS setup, and troubleshooting. SC220 Live compatibility with the MKII is clearly marked as unverified until a physical unit is tested.</p></div><article class="hardware-guide-card"><small>RECORDING TECH SC220 MKII / MK2</small><ul><li>24-bit / 192 kHz public claim</li><li>Two combo mic, line, or instrument inputs</li><li>+48 V, −20 dB PAD, USB-C, OTG, and direct-monitoring claims</li><li>Driver, ASIO, loopback, and endpoint status</li></ul><a href="${guideHref}">Open the SC220 MKII guide <span aria-hidden="true">→</span></a></article></div>`
-      : `<div class="hardware-guide-shell"><div><p class="kicker dark"><span></span> PANDUAN HARDWARE SC220 MKII</p><h2 id="sc220-mkii-guide-title">Pahami audio interface sebelum menyambungkannya.</h2><p>Pelajari spesifikasi publik, fungsi kontrol, wiring microphone dan karaoke processor, compatibility matrix, setup OBS, serta troubleshooting. Kompatibilitas SC220 Live dengan MKII ditandai belum terverifikasi sampai unit fisik diuji.</p></div><article class="hardware-guide-card"><small>RECORDING TECH SC220 MKII / MK2</small><ul><li>Klaim publik 24-bit / 192 kHz</li><li>Dua combo input mic, line, atau instrument</li><li>Klaim +48 V, PAD −20 dB, USB-C, OTG, dan direct monitoring</li><li>Status driver, ASIO, loopback, dan endpoint</li></ul><a href="${guideHref}">Buka panduan SC220 MKII <span aria-hidden="true">→</span></a></article></div>`;
+      ? `<div class="hardware-guide-shell"><div><p class="kicker dark"><span></span> SC220 MKII HARDWARE GUIDE</p><h2 id="sc220-mkii-guide-title">Understand the interface before connecting it.</h2><p>Read public specifications, control functions, wiring, compatibility status, goal-based setup, gain staging, and a complete support checklist.</p></div><article class="hardware-guide-card"><small>RECORDING TECH SC220 MKII / MK2</small><ul><li>Public hardware claims and verification status</li><li>Microphone, instrument, processor, and streaming routes</li><li>Goal-based setup and gain staging</li><li>Diagnostic checklist and issue template</li></ul><a href="${guideHref}">Open the hardware guide <span aria-hidden="true">→</span></a><div class="hardware-subnav"><a href="${setupHref}">Setup by goal</a><a href="${supportHref}">Support checklist</a></div></article></div>`
+      : `<div class="hardware-guide-shell"><div><p class="kicker dark"><span></span> PANDUAN HARDWARE SC220 MKII</p><h2 id="sc220-mkii-guide-title">Pahami audio interface sebelum menyambungkannya.</h2><p>Pelajari spesifikasi publik, fungsi kontrol, wiring, status kompatibilitas, setup berdasarkan tujuan, gain staging, dan checklist support lengkap.</p></div><article class="hardware-guide-card"><small>RECORDING TECH SC220 MKII / MK2</small><ul><li>Klaim hardware publik dan status verifikasi</li><li>Rute microphone, instrumen, processor, dan streaming</li><li>Setup berdasarkan tujuan dan gain staging</li><li>Checklist diagnosis dan template issue</li></ul><a href="${guideHref}">Buka panduan hardware <span aria-hidden="true">→</span></a><div class="hardware-subnav"><a href="${setupHref}">Setup berdasarkan tujuan</a><a href="${supportHref}">Checklist support</a></div></article></div>`;
 
     const k500Section = document.querySelector(".topic-section");
     const setupSection = document.querySelector(".setup-section");
@@ -141,8 +141,67 @@
     if (target?.parentNode) target.parentNode.insertBefore(section, target);
   };
 
-  installHardwareGuidePromo();
+  const installP1GuidePromo = () => {
+    const path = window.location.pathname.replace(/\/+$/, "/");
+    const isIdGuide = /\/sc220-download\/sc220-mkii-audio-interface\/$/.test(path);
+    const isEnGuide = /\/sc220-download\/en\/sc220-mkii-audio-interface\/$/.test(path);
+    if ((!isIdGuide && !isEnGuide) || document.querySelector(".p1-guide-promo")) return;
 
-  const year = document.querySelector("[data-year]");
-  if (year) year.textContent = String(new Date().getFullYear());
+    const stylesheetHref = isEnGuide ? "../../sc220-mkii-p1.css" : "../sc220-mkii-p1.css";
+    ensureStylesheet(stylesheetHref);
+
+    const guideNav = document.querySelector(".guide-nav");
+    if (guideNav && !guideNav.querySelector("[data-p1-setup]")) {
+      const setupLink = document.createElement("a");
+      setupLink.href = "setup/";
+      setupLink.dataset.p1Setup = "";
+      setupLink.textContent = isEnGuide ? "Setup by goal" : "Setup berdasarkan tujuan";
+      const supportLink = document.createElement("a");
+      supportLink.href = "support/";
+      supportLink.dataset.p1Support = "";
+      supportLink.textContent = "Support";
+      guideNav.append(setupLink, supportLink);
+    }
+
+    const promo = document.createElement("section");
+    promo.className = "p1-guide-promo";
+    promo.innerHTML = isEnGuide
+      ? `<div class="p1-shell"><div><h2>Continue with a goal-based setup or diagnostic checklist.</h2><p>Separate hardware gain, monitoring, software mixing, and broadcast output before troubleshooting.</p></div><div class="p1-guide-links"><a href="setup/">Open setup guide</a><a href="support/">Open support checklist</a></div></div>`
+      : `<div class="p1-shell"><div><h2>Lanjutkan ke setup berdasarkan tujuan atau checklist diagnosis.</h2><p>Pisahkan gain hardware, monitoring, mix software, dan output siaran sebelum melakukan troubleshooting.</p></div><div class="p1-guide-links"><a href="setup/">Buka cara setting</a><a href="support/">Buka checklist support</a></div></div>`;
+
+    const sourceSection = document.querySelector("#sumber");
+    const footer = document.querySelector("footer");
+    const target = sourceSection || footer;
+    if (target?.parentNode) target.parentNode.insertBefore(promo, target);
+  };
+
+  const supportCopyButton = document.querySelector("[data-copy-support-template]");
+  supportCopyButton?.addEventListener("click", async () => {
+    const template = document.querySelector("[data-support-template]")?.textContent?.trim();
+    const status = document.querySelector("[data-copy-support-status]");
+    if (!template) return;
+    try {
+      await navigator.clipboard.writeText(template);
+      if (status) status.textContent = copyLabels.templateDone;
+      window.setTimeout(() => {
+        if (status) status.textContent = "";
+      }, 2200);
+    } catch {
+      const selection = window.getSelection();
+      const range = document.createRange();
+      const node = document.querySelector("[data-support-template]");
+      if (!selection || !node) return;
+      range.selectNodeContents(node);
+      selection.removeAllRanges();
+      selection.addRange(range);
+      if (status) status.textContent = isEnglish ? "Select and copy the highlighted text" : "Pilih lalu salin teks yang disorot";
+    }
+  });
+
+  installHardwareGuidePromo();
+  installP1GuidePromo();
+
+  document.querySelectorAll("[data-year]").forEach((node) => {
+    node.textContent = String(new Date().getFullYear());
+  });
 })();
