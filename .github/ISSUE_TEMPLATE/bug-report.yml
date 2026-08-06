@@ -1,0 +1,103 @@
+name: Bug report
+description: Report a reproducible SC220 Live, installer, routing, or public-site problem.
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a problem. Remove license data, credentials, personal information, and security-sensitive details before submitting.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Affected area
+      options:
+        - Application startup or crash
+        - Audio device detection
+        - Input or PC audio routing
+        - Meters, faders, mute, or ducking
+        - Stream output / virtual audio cable
+        - Installer or release integrity
+        - Landing page or documentation
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: SC220 Live version
+      placeholder: e.g. v0.1.0
+    validations:
+      required: true
+
+  - type: input
+    id: windows
+    attributes:
+      label: Windows version and build
+      placeholder: e.g. Windows 11 24H2, build 26100
+    validations:
+      required: true
+
+  - type: input
+    id: hardware
+    attributes:
+      label: Audio hardware and driver
+      placeholder: e.g. Recording Tech SC220, WASAPI shared
+    validations:
+      required: true
+
+  - type: input
+    id: streaming_app
+    attributes:
+      label: Streaming application
+      placeholder: e.g. OBS Studio 32.x or TikTok Live Studio
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Provide the shortest reliable sequence that reproduces the problem.
+      placeholder: |
+        1. Open SC220 Live
+        2. Select ...
+        3. Enable ...
+        4. Observe ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Screenshots or sanitized logs
+      description: Drag files here. Remove personal information, activation data, and credentials.
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Pre-submission checks
+      options:
+        - label: I downloaded SC220 Live from the official GitHub Releases page.
+          required: true
+        - label: I verified the installer checksum or confirmed this is not an installer issue.
+          required: true
+        - label: I restarted the application and affected audio devices.
+          required: true
+        - label: This report does not contain a security vulnerability or sensitive data.
+          required: true
