@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url><loc>https://masarray.github.io/sc220-download/</loc><lastmod>2026-08-06</lastmod><changefreq>weekly</changefreq><priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="id" href="https://masarray.github.io/sc220-download/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://masarray.github.io/sc220-download/en/"/>
+  </url>
+  <url><loc>https://masarray.github.io/sc220-download/en/</loc><lastmod>2026-08-06</lastmod><changefreq>weekly</changefreq><priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="id" href="https://masarray.github.io/sc220-download/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://masarray.github.io/sc220-download/en/"/>
+  </url>
+  <url><loc>https://masarray.github.io/sc220-download/ktv-k500-karaoke-processor/</loc><lastmod>2026-08-06</lastmod><changefreq>monthly</changefreq><priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="id" href="https://masarray.github.io/sc220-download/ktv-k500-karaoke-processor/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://masarray.github.io/sc220-download/en/ktv-k500-karaoke-processor/"/>
+  </url>
+  <url><loc>https://masarray.github.io/sc220-download/en/ktv-k500-karaoke-processor/</loc><lastmod>2026-08-06</lastmod><changefreq>monthly</changefreq><priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="id" href="https://masarray.github.io/sc220-download/ktv-k500-karaoke-processor/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://masarray.github.io/sc220-download/en/ktv-k500-karaoke-processor/"/>
+  </url>
+</urlset>
