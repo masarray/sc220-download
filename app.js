@@ -8,11 +8,20 @@
     sha256: "c8a441f07605f48805233fbddf466312c1de733c647c95705317ad13ee2b7b04"
   };
 
+  const html = document.documentElement;
+  const isEnglish = html.lang.toLowerCase().startsWith("en");
+  const locale = isEnglish ? "en-US" : "id-ID";
+  const releaseSource = html.dataset.releaseSource || "latest.json";
+
+  const copyLabels = isEnglish
+    ? { idle: "Copy", done: "Copied" }
+    : { idle: "Salin", done: "Tersalin" };
+
   const formatDate = (value) => {
     if (!value) return "";
     const date = new Date(`${value}T00:00:00`);
     if (Number.isNaN(date.getTime())) return value;
-    return new Intl.DateTimeFormat("id-ID", {
+    return new Intl.DateTimeFormat(locale, {
       day: "numeric",
       month: "long",
       year: "numeric"
@@ -48,7 +57,7 @@
     });
   };
 
-  fetch("latest.json", { cache: "no-store" })
+  fetch(releaseSource, { cache: "no-store" })
     .then((response) => {
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       return response.json();
@@ -73,12 +82,13 @@
 
     try {
       await navigator.clipboard.writeText(value);
-      copyButton.querySelector("span").textContent = "Tersalin";
+      const label = copyButton.querySelector("span");
+      if (label) label.textContent = copyLabels.done;
       toast?.classList.add("show");
       window.clearTimeout(toastTimer);
       toastTimer = window.setTimeout(() => {
         toast?.classList.remove("show");
-        copyButton.querySelector("span").textContent = "Salin";
+        if (label) label.textContent = copyLabels.idle;
       }, 1800);
     } catch {
       const selection = window.getSelection();
