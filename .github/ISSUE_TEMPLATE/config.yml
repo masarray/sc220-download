@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Download SC220 Live
+    url: https://github.com/masarray/sc220-download/releases/latest
+    about: Download the current official Windows release and verification files.
+  - name: Product website and setup guide
+    url: https://masarray.github.io/sc220-download/
+    about: Read the product overview, setup steps, FAQ, and system requirements.
+  - name: Security policy
+    url: https://github.com/masarray/sc220-download/security/policy
+    about: Read the private vulnerability reporting instructions before disclosing security details.
