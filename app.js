@@ -101,6 +101,48 @@
     }
   });
 
+  const installHardwareGuidePromo = () => {
+    const path = window.location.pathname.replace(/\/+$/, "/");
+    const isLandingPage = /\/sc220-download\/(?:en\/)?$/.test(path);
+    if (!isLandingPage || document.querySelector(".hardware-guide-section")) return;
+
+    const guideHref = isEnglish
+      ? "sc220-mkii-audio-interface/"
+      : "sc220-mkii-audio-interface/";
+    const stylesheetHref = isEnglish ? "../sc220-mkii.css" : "sc220-mkii.css";
+
+    if (!document.querySelector(`link[href="${stylesheetHref}"]`)) {
+      const stylesheet = document.createElement("link");
+      stylesheet.rel = "stylesheet";
+      stylesheet.href = stylesheetHref;
+      document.head.appendChild(stylesheet);
+    }
+
+    const nav = document.querySelector(".desktop-nav");
+    if (nav && !nav.querySelector("[data-sc220-mkii-link]")) {
+      const navLink = document.createElement("a");
+      navLink.href = guideHref;
+      navLink.dataset.sc220MkiiLink = "";
+      navLink.textContent = "SC220 MKII";
+      const k500Link = Array.from(nav.querySelectorAll("a")).find((link) => link.href.includes("ktv-k500"));
+      nav.insertBefore(navLink, k500Link || nav.firstChild);
+    }
+
+    const section = document.createElement("section");
+    section.className = "hardware-guide-section";
+    section.setAttribute("aria-labelledby", "sc220-mkii-guide-title");
+    section.innerHTML = isEnglish
+      ? `<div class="hardware-guide-shell"><div><p class="kicker dark"><span></span> SC220 MKII HARDWARE GUIDE</p><h2 id="sc220-mkii-guide-title">Understand the interface before connecting it.</h2><p>Read public specifications, control functions, microphone and karaoke-processor wiring, a compatibility matrix, OBS setup, and troubleshooting. SC220 Live compatibility with the MKII is clearly marked as unverified until a physical unit is tested.</p></div><article class="hardware-guide-card"><small>RECORDING TECH SC220 MKII / MK2</small><ul><li>24-bit / 192 kHz public claim</li><li>Two combo mic, line, or instrument inputs</li><li>+48 V, −20 dB PAD, USB-C, OTG, and direct-monitoring claims</li><li>Driver, ASIO, loopback, and endpoint status</li></ul><a href="${guideHref}">Open the SC220 MKII guide <span aria-hidden="true">→</span></a></article></div>`
+      : `<div class="hardware-guide-shell"><div><p class="kicker dark"><span></span> PANDUAN HARDWARE SC220 MKII</p><h2 id="sc220-mkii-guide-title">Pahami audio interface sebelum menyambungkannya.</h2><p>Pelajari spesifikasi publik, fungsi kontrol, wiring microphone dan karaoke processor, compatibility matrix, setup OBS, serta troubleshooting. Kompatibilitas SC220 Live dengan MKII ditandai belum terverifikasi sampai unit fisik diuji.</p></div><article class="hardware-guide-card"><small>RECORDING TECH SC220 MKII / MK2</small><ul><li>Klaim publik 24-bit / 192 kHz</li><li>Dua combo input mic, line, atau instrument</li><li>Klaim +48 V, PAD −20 dB, USB-C, OTG, dan direct monitoring</li><li>Status driver, ASIO, loopback, dan endpoint</li></ul><a href="${guideHref}">Buka panduan SC220 MKII <span aria-hidden="true">→</span></a></article></div>`;
+
+    const k500Section = document.querySelector(".topic-section");
+    const setupSection = document.querySelector(".setup-section");
+    const target = k500Section || setupSection;
+    if (target?.parentNode) target.parentNode.insertBefore(section, target);
+  };
+
+  installHardwareGuidePromo();
+
   const year = document.querySelector("[data-year]");
   if (year) year.textContent = String(new Date().getFullYear());
 })();
