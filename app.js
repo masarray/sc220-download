@@ -201,6 +201,9 @@
   installHardwareGuidePromo();
   installP1GuidePromo();
 
+  // Always append the unified refinement after every static and injected base stylesheet.
+  ensureStylesheet("/sc220-download/site-refinement.css?v=20260807-1");
+
   document.querySelectorAll("[data-year]").forEach((node) => {
     node.textContent = String(new Date().getFullYear());
   });
