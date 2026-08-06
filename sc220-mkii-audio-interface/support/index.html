@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#121313">
+  <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
+  <title>Support SC220 MKII – Checklist Diagnosis & Laporan Masalah</title>
+  <meta name="description" content="Checklist support Recording Tech SC220 MKII: model, wiring, Windows endpoint, sample rate, input mode, meter, OBS, SC220 Live, langkah diagnosis dan template laporan.">
+  <link rel="canonical" href="https://masarray.github.io/sc220-download/sc220-mkii-audio-interface/support/">
+  <link rel="alternate" hreflang="id" href="https://masarray.github.io/sc220-download/sc220-mkii-audio-interface/support/">
+  <link rel="alternate" hreflang="en" href="https://masarray.github.io/sc220-download/en/sc220-mkii-audio-interface/support/">
+  <link rel="alternate" hreflang="x-default" href="https://masarray.github.io/sc220-download/sc220-mkii-audio-interface/support/">
+  <link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="SC220 Live">
+  <meta property="og:url" content="https://masarray.github.io/sc220-download/sc220-mkii-audio-interface/support/">
+  <meta property="og:title" content="Support Recording Tech SC220 MKII">
+  <meta property="og:description" content="Checklist diagnosis dan template laporan masalah untuk SC220, SC220 MKII, SC220 Live, OBS, dan jalur karaoke.">
+  <meta property="og:image" content="https://masarray.github.io/sc220-download/og-sc220-id.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Support dan troubleshooting Recording Tech SC220 MKII">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Support SC220 MKII">
+  <meta name="twitter:description" content="Checklist diagnosis, data wajib, dan template laporan masalah.">
+  <meta name="twitter:image" content="https://masarray.github.io/sc220-download/og-sc220-id.png">
+  <link rel="stylesheet" href="../../sc220-mkii-p1.css">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@graph":[
+    {"@type":"BreadcrumbList","itemListElement":[
+      {"@type":"ListItem","position":1,"name":"SC220 Live","item":"https://masarray.github.io/sc220-download/"},
+      {"@type":"ListItem","position":2,"name":"SC220 MKII","item":"https://masarray.github.io/sc220-download/sc220-mkii-audio-interface/"},
+      {"@type":"ListItem","position":3,"name":"Support","item":"https://masarray.github.io/sc220-download/sc220-mkii-audio-interface/support/"}
+    ]},
+    {"@type":"FAQPage","mainEntity":[
+      {"@type":"Question","name":"Mengapa SC220 tidak muncul di Windows?","acceptedAnswer":{"@type":"Answer","text":"Periksa kabel data, port USB, daya, Device Manager, Windows Sound, dan uji tanpa hub. Nama endpoint dapat berbeda antar revisi."}},
+      {"@type":"Question","name":"Mengapa microphone hanya terdengar di kiri?","acceptedAnswer":{"@type":"Answer","text":"Satu microphone biasanya menggunakan satu kanal mono. Pilih input mono atau aktifkan mono handling pada aplikasi tujuan."}},
+      {"@type":"Question","name":"Mengapa suara echo atau dobel?","acceptedAnswer":{"@type":"Answer","text":"Direct monitoring dan software monitoring mungkin aktif bersamaan, atau sumber yang sama ditangkap dua kali."}},
+      {"@type":"Question","name":"Apakah perlu mengunduh driver dari situs pihak ketiga?","acceptedAnswer":{"@type":"Answer","text":"Jangan memasang driver tidak resmi tanpa identitas vendor dan sumber yang dapat diverifikasi. Catat lebih dulu bagaimana Windows mendeteksi perangkat."}}
+    ]}
+  ]}
+  </script>
+</head>
+<body class="p1-page">
+<header class="p1-header">
+  <nav class="p1-nav" aria-label="Navigasi support">
+    <a class="p1-brand" href="../../">SC220 <b>LIVE</b></a>
+    <div class="p1-navlinks"><a href="../">Panduan hardware</a><a href="../setup/">Cara setting</a><a href="#checklist">Checklist</a><a href="#template">Template laporan</a><a href="#faq">FAQ</a></div>
+    <a class="p1-language" href="../../en/sc220-mkii-audio-interface/support/" lang="en">English</a>
+  </nav>
+</header>
+<main>
+<section class="p1-hero">
+  <div class="p1-shell p1-hero-grid">
+    <div>
+      <p class="p1-eyebrow">SC220 MKII SUPPORT</p>
+      <h1>Diagnosis yang rapi dimulai dari data yang lengkap.</h1>
+      <p>Gunakan halaman ini sebelum membuka issue tentang SC220, SC220 MKII, SC220 Live, OBS, TikTok Live Studio, VB-CABLE, atau karaoke processor. Tujuannya adalah memisahkan masalah hardware, Windows, routing, software, dan gain staging.</p>
+      <div class="p1-actions"><a class="p1-button primary" href="#checklist">Mulai diagnosis</a><a class="p1-button secondary" href="https://github.com/masarray/sc220-download/issues/new?template=bug-report.yml">Buka bug report</a></div>
+    </div>
+    <aside class="p1-status-card"><small>PRIVASI & KEAMANAN</small><h2>Jangan unggah data sensitif.</h2><p>Hapus license key, activation ID, email pribadi, serial number yang tidak perlu, credential, dan informasi akun dari screenshot atau log. Kerentanan keamanan harus mengikuti SECURITY.md, bukan issue publik.</p></aside>
+  </div>
+</section>
+<section class="p1-section" id="checklist">
+  <div class="p1-shell">
+    <div class="p1-heading"><h2>Checklist sebelum menyimpulkan perangkat rusak.</h2><p>Uji satu variabel pada satu waktu. Catat hasil setiap langkah agar perubahan tidak saling menutupi.</p></div>
+    <div class="p1-support-grid">
+      <article class="p1-checklist"><h2>1. Identitas dan koneksi</h2><ul>
+        <li>Foto label model pada unit atau kemasan: SC220, SC220 MKII, atau nama lain.</li>
+        <li>Foto panel depan dan belakang dengan label port terlihat.</li>
+        <li>Jenis kabel USB dan apakah kabel tersebut mendukung data.</li>
+        <li>Port USB langsung atau melalui hub/docking.</li>
+        <li>Jenis sumber: dynamic mic, condenser mic, gitar, mixer, atau karaoke processor.</li>
+        <li>Wiring lengkap dari sumber sampai speaker, headphone, dan aplikasi.</li>
+      </ul></article>
+      <article class="p1-checklist"><h2>2. Windows dan driver</h2><ul>
+        <li>Windows 10/11, edition, version, dan OS build.</li>
+        <li>Nama perangkat di Device Manager dan Windows Sound.</li>
+        <li>Jumlah input/output yang terlihat.</li>
+        <li>Sample rate dan bit depth yang dipilih.</li>
+        <li>Driver type yang benar-benar digunakan: Windows audio, WASAPI, atau ASIO bila tersedia.</li>
+        <li>Apakah perangkat hilang setelah sleep, reconnect, atau pindah port.</li>
+      </ul></article>
+      <article class="p1-checklist"><h2>3. Kontrol hardware</h2><ul>
+        <li>Posisi gain input 1 dan 2.</li>
+        <li>Status +48 V dan alasan penggunaannya.</li>
+        <li>Status PAD dan Line/Instrument.</li>
+        <li>Apakah meter hardware bergerak.</li>
+        <li>Apakah headphone/direct monitor mengeluarkan suara.</li>
+        <li>Apakah masalah tetap ada ketika DSP dan aplikasi lain ditutup.</li>
+      </ul></article>
+      <article class="p1-checklist"><h2>4. Software dan routing</h2><ul>
+        <li>Versi SC220 Live, OBS, TikTok Live Studio, DAW, atau aplikasi lain.</li>
+        <li>Nama input, playback source, dan stream output yang dipilih.</li>
+        <li>Screenshot meter pada setiap tahap.</li>
+        <li>Apakah sumber yang sama ditangkap dua kali.</li>
+        <li>Apakah exclusive mode atau aplikasi lain mengunci device.</li>
+        <li>Apakah masalah terjadi sebelum atau setelah GO LIVE/stream output.</li>
+      </ul></article>
+    </div>
+  </div>
+</section>
+<section class="p1-section dark">
+  <div class="p1-shell">
+    <div class="p1-heading"><h2>Urutan diagnosis tanpa menebak.</h2><p>Mulai dari jalur paling sederhana, lalu tambahkan satu komponen setiap kali hasil dasar sudah stabil.</p></div>
+    <div class="p1-chain">
+      <article class="p1-stage"><span>1</span><h3>Hardware only</h3><p>Uji microphone atau source ke SC220 dan dengarkan direct monitor/headphone bila tersedia.</p></article>
+      <article class="p1-stage"><span>2</span><h3>Windows input</h3><p>Periksa endpoint, meter Windows, sample rate, dan izin microphone.</p></article>
+      <article class="p1-stage"><span>3</span><h3>Satu aplikasi</h3><p>Gunakan hanya satu aplikasi capture tanpa DSP, virtual cable, atau monitoring tambahan.</p></article>
+      <article class="p1-stage"><span>4</span><h3>SC220 Live</h3><p>Tambahkan routing, fader, meter, dan stream output setelah input dasar terbukti bekerja.</p></article>
+      <article class="p1-stage"><span>5</span><h3>Broadcast chain</h3><p>Tambahkan OBS/TikTok, rekam tes, dan bandingkan meter serta hasil playback.</p></article>
+    </div>
+  </div>
+</section>
+<section class="p1-section" id="template">
+  <div class="p1-shell">
+    <div class="p1-heading"><h2>Template laporan masalah.</h2><p>Salin template ini ke GitHub issue. Isi bagian yang relevan dan tulis “belum diuji” daripada menebak.</p></div>
+    <div class="p1-template">
+      <pre data-support-template>## Ringkasan masalah
+Jelaskan masalah dalam 1–3 kalimat.
+
+## Model hardware
+- Model pada label:
+- Foto panel depan/belakang:
+- Jenis kabel USB:
+- Port langsung / hub:
+
+## Sumber dan wiring
+- Jenis microphone/instrument/processor:
+- Input yang digunakan:
+- Mode Mic/Line/Instrument:
+- +48 V:
+- PAD:
+- Diagram wiring:
+
+## Windows
+- Edition/version/build:
+- Nama di Device Manager:
+- Nama input/output di Windows Sound:
+- Sample rate / bit depth:
+- Driver/API audio:
+
+## Software
+- SC220 Live version:
+- OBS/TikTok/DAW version:
+- Input terpilih:
+- Playback source:
+- Stream output:
+
+## Langkah reproduksi
+1.
+2.
+3.
+
+## Hasil yang diharapkan
+
+## Hasil aktual
+
+## Meter dan bukti
+- Meter hardware:
+- Meter SC220 Live:
+- Meter OBS/aplikasi:
+- Screenshot/log tanpa data pribadi:
+
+## Uji yang sudah dilakukan
+- Kabel/port lain:
+- Tanpa hub:
+- Restart/reconnect:
+- DSP dimatikan:
+- Direct monitor saja:
+- Aplikasi lain ditutup:</pre>
+      <button type="button" data-copy-support-template>Salin template</button><span class="p1-copy-status" data-copy-support-status aria-live="polite"></span>
+    </div>
+  </div>
+</section>
+<section class="p1-section" id="faq">
+  <div class="p1-shell p1-faq">
+    <div class="p1-heading"><h2>Pertanyaan diagnosis yang paling sering muncul.</h2><p>Jawaban di bawah adalah langkah awal. Nama kontrol dan dukungan driver tetap harus dicocokkan dengan unit fisik.</p></div>
+    <details><summary>SC220 tidak muncul di Windows. Apa yang harus dicek?</summary><p>Gunakan kabel data yang terbukti bekerja, coba port USB langsung, hindari hub sementara, periksa Device Manager dan Windows Sound, lalu uji setelah restart. Catat apakah perangkat muncul sebagai unknown device atau tidak muncul sama sekali.</p></details>
+    <details><summary>Microphone hanya terdengar di kiri atau kanan.</summary><p>Satu microphone yang masuk ke satu input adalah sumber mono. Pilih kanal input mono atau aktifkan mono handling pada aplikasi tujuan. Jangan mengubahnya menjadi stereo dengan menyalin kanal tanpa memahami routing.</p></details>
+    <details><summary>Condenser microphone tidak bersuara.</summary><p>Pastikan microphone memang memerlukan phantom power, kabel XLR benar, gain tidak minimum, dan +48 V diaktifkan setelah kabel terpasang. Jangan menggunakan phantom power sebagai solusi untuk semua microphone.</p></details>
+    <details><summary>Suara echo atau terdengar dobel.</summary><p>Matikan salah satu antara direct monitoring dan software monitoring. Pastikan sumber yang sama tidak ditangkap melalui device langsung sekaligus melalui SC220 Live atau virtual cable.</p></details>
+    <details><summary>Suara pecah walaupun fader OBS rendah.</summary><p>Clipping kemungkinan terjadi lebih awal. Turunkan output sumber atau hardware gain, periksa PAD/line mode, matikan processing tambahan, dan uji meter dari input sampai output.</p></details>
+    <details><summary>Apakah harus memasang driver yang ditemukan dari situs pihak ketiga?</summary><p>Tidak disarankan. Jangan memasang binary driver yang tidak dapat dikaitkan dengan vendor dan model secara jelas. Simpan screenshot device identity lebih dulu dan gunakan sumber resmi ketika tersedia.</p></details>
+  </div>
+</section>
+<section class="p1-section dark">
+  <div class="p1-shell p1-support-grid">
+    <div><p class="p1-eyebrow">PUBLIC SUPPORT</p><h2>Issue yang lengkap mendapat prioritas lebih tinggi.</h2><p>Repository ini memberikan dukungan best-effort untuk installer, landing page, dokumentasi, device detection, routing, dan perilaku SC220 Live yang dapat direproduksi.</p></div>
+    <div class="p1-actions"><a class="p1-button primary" href="https://github.com/masarray/sc220-download/issues/new?template=bug-report.yml">Buka structured bug report</a><a class="p1-button secondary" href="https://github.com/masarray/sc220-download/blob/main/SECURITY.md">Security policy</a></div>
+  </div>
+</section>
+</main>
+<footer class="p1-footer"><div class="p1-shell"><span>© <span data-year>2026</span> MasArray / Recording Tech</span><span><a href="../">Panduan SC220 MKII</a> · <a href="../setup/">Cara setting</a> · <a href="../../">SC220 Live</a></span></div></footer>
+<script src="../../app.js" defer></script>
+</body>
+</html>
