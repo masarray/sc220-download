@@ -105,11 +105,6 @@
     document.head.appendChild(stylesheet);
   };
 
-  // Load one final, cache-busted refinement layer after every page's base styles.
-  // This keeps the bilingual homepage, K500 guide, hardware guide, setup, and
-  // support pages visually consistent without changing their SEO markup.
-  ensureStylesheet("/sc220-download/site-refinement.css?v=20260807-1");
-
   const installHardwareGuidePromo = () => {
     const path = window.location.pathname.replace(/\/+$/, "/");
     const isLandingPage = /\/sc220-download\/(?:en\/)?$/.test(path);
@@ -205,6 +200,9 @@
 
   installHardwareGuidePromo();
   installP1GuidePromo();
+
+  // Always append the unified refinement after every static and injected base stylesheet.
+  ensureStylesheet("/sc220-download/site-refinement.css?v=20260807-1");
 
   document.querySelectorAll("[data-year]").forEach((node) => {
     node.textContent = String(new Date().getFullYear());
