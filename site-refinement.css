@@ -1,0 +1,486 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
+
+:root {
+  --ux-shell: min(1160px, calc(100vw - 48px));
+  --ux-article: min(880px, calc(100vw - 48px));
+  --ux-bg: #f5f3ee;
+  --ux-paper: #ffffff;
+  --ux-ink: #171918;
+  --ux-muted: #626863;
+  --ux-line: rgba(23, 25, 24, .11);
+  --ux-dark: #101212;
+  --ux-dark-soft: #191c1b;
+  --ux-orange: #ef7b2d;
+  --ux-orange-soft: #ff9a55;
+  --ux-radius-sm: 12px;
+  --ux-radius-md: 18px;
+  --ux-radius-lg: 24px;
+  --ux-shadow-sm: 0 10px 30px rgba(26, 22, 16, .065);
+  --ux-shadow-md: 0 22px 60px rgba(26, 22, 16, .11);
+}
+
+html { scroll-padding-top: 88px; }
+body,
+.guide-page,
+.p1-page {
+  font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-optical-sizing: auto;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+body { background: var(--ux-bg); }
+body p,
+body li { text-wrap: pretty; }
+body h1,
+body h2,
+body h3 { text-wrap: balance; }
+
+/* Shared header rhythm */
+.site-header,
+.p1-header {
+  background: rgba(15, 17, 17, .92);
+  border-bottom-color: rgba(255, 255, 255, .075);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, .12);
+  -webkit-backdrop-filter: saturate(145%) blur(16px);
+  backdrop-filter: saturate(145%) blur(16px);
+}
+.nav-shell,
+.p1-nav,
+.guide-shell,
+.hardware-guide-shell,
+.p1-shell { max-width: 1160px; }
+.nav-shell { width: var(--ux-shell); gap: 24px; }
+.desktop-nav { gap: 5px; }
+.desktop-nav a,
+.guide-nav a,
+.p1-navlinks a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 38px;
+  padding: 0 11px;
+  border-radius: 10px;
+  font-size: 12.5px;
+  font-weight: 600;
+  transition: color .18s ease, background .18s ease;
+}
+.desktop-nav a:hover,
+.guide-nav a:hover,
+.p1-navlinks a:hover { background: rgba(255,255,255,.065); }
+.header-download,
+.p1-language {
+  min-height: 40px;
+  border-radius: 11px;
+  font-weight: 650;
+}
+
+/* Main landing pages */
+.hero { min-height: auto; padding-top: 132px; }
+.hero-shell {
+  width: var(--ux-shell);
+  grid-template-columns: minmax(0, .92fr) minmax(500px, 1.08fr);
+  gap: clamp(44px, 5vw, 68px);
+}
+.hero h1 { font-size: clamp(43px, 5vw, 66px); font-weight: 700; }
+.hero-lead { max-width: 590px; }
+.product-stage {
+  border-radius: var(--ux-radius-md);
+  transform: none;
+  box-shadow: 0 28px 80px rgba(0,0,0,.34);
+}
+.hero-bottom { width: var(--ux-shell); margin-top: 68px; }
+.plain-section,
+.dark-section,
+.setup-section,
+.download-section { padding: 96px 0; }
+.plain-section > *,
+.dark-section > *,
+.setup-section > *,
+.download-section > * { width: var(--ux-shell); }
+.split-heading {
+  grid-template-columns: minmax(0, 1fr) minmax(300px, .55fr);
+  gap: 48px;
+  align-items: start;
+}
+.section-heading { margin-bottom: 44px; }
+.section-heading h2,
+.setup-copy h2,
+.download-copy h2,
+.requirements h2,
+.faq h2 {
+  max-width: 16ch;
+  font-size: clamp(32px, 3.8vw, 48px);
+  font-weight: 700;
+  line-height: 1.08;
+}
+.section-heading > p { max-width: 46ch; justify-self: end; }
+.button { min-height: 48px; border-radius: 12px; }
+
+/* Replace cramped inline signal connectors with a stable card grid. */
+.signal-flow {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  align-items: stretch;
+}
+.signal-flow .flow-join,
+.signal-flow .flow-arrow { display: none; }
+.signal-flow article,
+.signal-flow article:nth-of-type(3),
+.signal-flow article:nth-of-type(4) {
+  min-height: 270px;
+  margin: 0;
+  border-radius: var(--ux-radius-md);
+  background: rgba(255,255,255,.68);
+  box-shadow: var(--ux-shadow-sm);
+}
+.signal-flow article.flow-highlight { border-radius: var(--ux-radius-md); }
+.flow-icon,
+.feature-icon { border-radius: 11px; }
+
+.feature-grid { gap: 16px; }
+.feature-card {
+  min-height: 228px;
+  padding: 28px;
+  border-radius: var(--ux-radius-md);
+}
+.feature-wide { min-height: 290px; border-radius: var(--ux-radius-md); }
+.mini-channel { border-radius: 12px; }
+
+.setup-shell { grid-template-columns: minmax(280px, .72fr) minmax(0, 1.28fr); gap: 72px; }
+.setup-steps li { padding: 25px 0; }
+
+/* The markup contains two licence blocks, not three. */
+.licence-card {
+  grid-template-columns: minmax(0, 1.12fr) minmax(320px, .88fr);
+  border-radius: var(--ux-radius-md);
+  background: rgba(255,255,255,.68);
+  box-shadow: var(--ux-shadow-sm);
+}
+.licence-card > div { padding: 38px; }
+
+.download-shell { grid-template-columns: minmax(0, 1fr) minmax(360px, .72fr); gap: 64px; }
+.release-card { border-radius: var(--ux-radius-md); }
+.requirements-faq { grid-template-columns: minmax(280px, .78fr) minmax(0, 1.22fr); gap: 72px; }
+.footer-top { grid-template-columns: auto minmax(260px, 1fr) auto; gap: 34px; }
+
+/* Homepage-injected SC220 guide */
+.hardware-guide-section { padding: 82px 0; }
+.hardware-guide-shell {
+  width: var(--ux-shell);
+  grid-template-columns: minmax(0, 1fr) minmax(340px, .72fr);
+  gap: 44px;
+}
+.hardware-guide-section h2 { max-width: 15ch; font-weight: 700; }
+.hardware-guide-card {
+  padding: 28px;
+  border-radius: var(--ux-radius-md);
+  box-shadow: var(--ux-shadow-sm);
+}
+.hardware-guide-card .hardware-subnav a {
+  min-height: 38px;
+  padding: 0 12px;
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--ux-line);
+  border-radius: 10px;
+  color: var(--ux-ink);
+}
+
+/* K500 / article pages */
+.topic-section { padding: 84px 0; }
+.topic-shell {
+  width: var(--ux-shell);
+  grid-template-columns: minmax(0, 1fr) minmax(340px, .72fr);
+  gap: 44px;
+}
+.topic-copy h2 { max-width: 15ch; font-weight: 700; }
+.topic-card { padding: 30px; border-radius: var(--ux-radius-md); }
+.breadcrumbs { width: var(--ux-shell); }
+.guide-hero { padding-bottom: 80px; }
+.guide-hero-shell {
+  width: var(--ux-shell);
+  grid-template-columns: minmax(0, 1.05fr) minmax(340px, .72fr);
+  gap: 54px;
+}
+.guide-hero h1 { font-size: clamp(42px, 5vw, 64px); font-weight: 720; }
+.guide-panel { border-radius: var(--ux-radius-md); }
+.article-shell { width: var(--ux-article); }
+.article-section { padding: 78px 0; }
+.article-section h2 { font-size: clamp(31px, 3.8vw, 45px); font-weight: 720; }
+.article-section p { max-width: 72ch; font-size: 16px; }
+.intent-box,
+.comparison-wrap { border-radius: var(--ux-radius-md); }
+.signal-example { gap: 16px; }
+.signal-example article {
+  min-height: 180px;
+  padding: 24px;
+  border-radius: var(--ux-radius-md);
+  box-shadow: var(--ux-shadow-sm);
+}
+.signal-example article:not(:last-child)::after {
+  right: -10px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid var(--ux-bg);
+  font-family: Arial, sans-serif;
+  line-height: 1;
+  transform: translate(50%, -50%);
+}
+
+/* SC220 MKII hardware guide */
+.guide-page { background: var(--ux-bg); }
+.guide-page .guide-shell { width: var(--ux-shell); }
+.guide-page .guide-hero { padding: 106px 0 76px; }
+.guide-hero-grid {
+  grid-template-columns: minmax(0, 1fr) minmax(340px, .72fr);
+  gap: 54px;
+}
+.guide-page .guide-hero h1 { font-size: clamp(42px, 5vw, 64px); font-weight: 720; }
+.guide-status-card { border-radius: var(--ux-radius-lg); }
+.guide-section { padding: 84px 0; }
+.guide-heading {
+  grid-template-columns: minmax(0, 1fr) minmax(300px, .55fr);
+  gap: 44px;
+  align-items: start;
+}
+.guide-heading h2,
+.guide-title { max-width: 15ch; font-size: clamp(32px, 3.8vw, 48px); font-weight: 720; }
+.identity-grid,
+.connection-grid,
+.usage-grid,
+.test-grid { gap: 16px; }
+.identity-card,
+.connection-card,
+.usage-card,
+.test-card,
+.source-box,
+.spec-wrap,
+.matrix-wrap {
+  border-radius: var(--ux-radius-md);
+  box-shadow: var(--ux-shadow-sm);
+}
+.identity-card,
+.connection-card,
+.usage-card,
+.test-card { min-height: 210px; padding: 26px; }
+.control-layout { grid-template-columns: minmax(0, 1.1fr) minmax(330px, .9fr); gap: 24px; }
+.panel-schematic { border-radius: var(--ux-radius-lg); }
+.control-item { border-radius: 12px; }
+.faq-list details { border-radius: 12px; }
+
+/* P1 setup and support pages: narrower, cleaner, less crowded. */
+.p1-page { background: var(--ux-bg); color: var(--ux-ink); }
+.p1-page .p1-shell,
+.p1-nav { width: min(1120px, calc(100vw - 48px)); }
+.p1-nav { min-height: 72px; gap: 18px; }
+.p1-navlinks { gap: 2px; }
+.p1-hero { padding: 82px 0 72px; }
+.p1-hero-grid {
+  grid-template-columns: minmax(0, 1fr) minmax(320px, .64fr);
+  gap: 48px;
+  align-items: center;
+}
+.p1-hero h1 { max-width: 13ch; font-size: clamp(40px, 4.7vw, 60px); font-weight: 740; }
+.p1-status-card { padding: 28px; border-radius: var(--ux-radius-lg); }
+.p1-section { padding: 82px 0; }
+.p1-heading {
+  grid-template-columns: minmax(0, 1fr) minmax(280px, .5fr);
+  gap: 40px;
+  margin-bottom: 36px;
+  align-items: start;
+}
+.p1-heading h2 { max-width: 13ch; font-size: clamp(32px, 3.7vw, 46px); font-weight: 740; }
+.p1-heading p { max-width: 42ch; justify-self: end; }
+.p1-goals { gap: 16px; grid-auto-rows: 1fr; }
+.p1-goal {
+  min-height: 178px;
+  padding: 24px;
+  border-radius: var(--ux-radius-md);
+}
+.p1-goal h3 { font-size: 21px; }
+
+/* Three columns is the comfortable default at common 1100–1200 px desktop widths. */
+.p1-chain {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  grid-auto-rows: 1fr;
+}
+.p1-stage {
+  min-height: 210px;
+  padding: 24px;
+  border-radius: var(--ux-radius-md);
+}
+.p1-stage:not(:last-child)::after { display: none; }
+.p1-callout { border-radius: 12px; }
+.p1-routes { gap: 16px; grid-auto-rows: 1fr; }
+.p1-route {
+  min-height: 100%;
+  padding: 27px;
+  border-radius: var(--ux-radius-md);
+}
+.p1-route h3 { font-size: 23px; }
+.p1-support-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  align-items: stretch;
+}
+.p1-checklist,
+.p1-template {
+  min-height: 100%;
+  padding: 27px;
+  border-radius: var(--ux-radius-md);
+}
+.p1-checklist h2,
+.p1-template h2 { font-size: 22px; }
+.p1-table-wrap { border-radius: var(--ux-radius-md); }
+.p1-guide-promo { padding: 28px 0; }
+.p1-guide-promo .p1-shell { gap: 24px; }
+
+/* Only very wide screens get the connected five-step row. */
+@media (min-width: 1280px) {
+  .p1-chain { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 18px; }
+  .p1-stage { min-height: 224px; }
+  .p1-stage:not(:last-child)::after {
+    content: "→";
+    display: flex;
+    right: -9px;
+    top: 50%;
+    width: 30px;
+    height: 30px;
+    align-items: center;
+    justify-content: center;
+    border: 3px solid var(--ux-dark);
+    padding: 0 0 1px;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1;
+    transform: translate(50%, -50%);
+  }
+}
+
+@media (max-width: 1180px) {
+  .desktop-nav,
+  .guide-nav { display: none; }
+  .header-download { margin-left: auto; }
+  .hero-shell,
+  .guide-hero-shell,
+  .guide-hero-grid,
+  .p1-hero-grid { grid-template-columns: 1fr; }
+  .hero-copy,
+  .guide-hero-copy { max-width: 760px; }
+  .product-stage { width: min(900px, 100%); }
+  .signal-flow { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .control-layout { grid-template-columns: 1fr; }
+  .panel-schematic { max-width: 820px; }
+}
+
+@media (max-width: 940px) {
+  :root { --ux-shell: min(760px, calc(100vw - 34px)); --ux-article: min(760px, calc(100vw - 34px)); }
+  .split-heading,
+  .topic-shell,
+  .hardware-guide-shell,
+  .guide-heading,
+  .setup-shell,
+  .download-shell,
+  .requirements-faq,
+  .p1-heading { grid-template-columns: 1fr; gap: 22px; }
+  .section-heading > p,
+  .p1-heading p { justify-self: start; max-width: 60ch; }
+  .feature-grid,
+  .identity-grid,
+  .connection-grid,
+  .usage-grid,
+  .test-grid,
+  .p1-goals,
+  .p1-routes { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .licence-card { grid-template-columns: 1fr; }
+  .licence-card > div + div { border-left: 0; border-top: 1px solid var(--ux-line); }
+  .setup-copy { position: static; }
+  .p1-navlinks { display: none; }
+  .p1-language { margin-left: auto; }
+  .p1-support-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 700px) {
+  :root { --ux-shell: calc(100vw - 28px); --ux-article: calc(100vw - 28px); }
+  .hero,
+  .guide-page .guide-hero { padding-top: 104px; }
+  .plain-section,
+  .dark-section,
+  .setup-section,
+  .download-section,
+  .guide-section,
+  .article-section,
+  .p1-section { padding: 66px 0; }
+  .signal-flow,
+  .feature-grid,
+  .identity-grid,
+  .connection-grid,
+  .usage-grid,
+  .test-grid,
+  .p1-goals,
+  .p1-routes,
+  .p1-chain { grid-template-columns: 1fr; }
+  .signal-flow article { min-height: 0; }
+  .feature-wide { grid-template-columns: 1fr; }
+  .p1-chain { gap: 28px; }
+  .p1-stage { min-height: 0; }
+  .p1-stage:not(:last-child)::after {
+    content: "↓";
+    display: flex;
+    right: 50%;
+    top: auto;
+    bottom: -23px;
+    width: 28px;
+    height: 28px;
+    align-items: center;
+    justify-content: center;
+    border: 3px solid var(--ux-dark);
+    padding: 0;
+    font-family: Arial, sans-serif;
+    line-height: 1;
+    transform: translate(50%, 50%);
+  }
+  .signal-example { grid-template-columns: 1fr; }
+  .signal-example article::after { display: none !important; }
+  .p1-page .p1-shell,
+  .p1-nav { width: calc(100vw - 28px); }
+  .p1-hero { padding: 62px 0 56px; }
+  .p1-hero h1 { font-size: clamp(35px, 11vw, 47px); }
+  .p1-button { width: 100%; }
+  .p1-actions { width: 100%; }
+}
+
+@media (max-width: 520px) {
+  .brand-divider,
+  .brand-product { display: none; }
+  .brand img { width: 138px; }
+  .header-download,
+  .p1-language { min-height: 37px; padding-inline: 11px; }
+  .hero h1 { font-size: 38px; }
+  .section-heading h2,
+  .setup-copy h2,
+  .download-copy h2,
+  .requirements h2,
+  .faq h2,
+  .guide-heading h2,
+  .guide-title,
+  .p1-heading h2 { font-size: 32px; }
+  .topic-card,
+  .hardware-guide-card,
+  .identity-card,
+  .connection-card,
+  .usage-card,
+  .test-card,
+  .p1-goal,
+  .p1-route,
+  .p1-checklist,
+  .p1-template { padding: 22px; }
+  .release-card { padding: 20px 17px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; }
+}
