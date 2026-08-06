@@ -1,10 +1,13 @@
-﻿{
+{
   "product": "SC220 Live",
-  "version": "0.1.0-rc",
-  "published": "2026-08-03",
+  "version": "0.1.0",
+  "published": "2026-08-06",
   "platform": "windows-x64",
-  "status": "pending-payment-production",
-  "download": "",
-  "sha256": "",
-  "checksum": ""
+  "status": "stable",
+  "download": "https://github.com/masarray/sc220-download/releases/download/v0.1.0/SC220-Live-v0.1.0-Setup-win-x64.exe",
+  "sha256": "c8a441f07605f48805233fbddf466312c1de733c647c95705317ad13ee2b7b04",
+  "checksum": "https://github.com/masarray/sc220-download/releases/download/v0.1.0/SC220-Live-v0.1.0-Setup-win-x64.exe.sha256",
+  "manifest": "https://github.com/masarray/sc220-download/releases/download/v0.1.0/SC220-Live-v0.1.0-Setup-win-x64.manifest.json",
+  "source_commit": "3629c5f816159e4a1455220ad51c58362568a29a",
+  "vb_cable_optional": true
 }
