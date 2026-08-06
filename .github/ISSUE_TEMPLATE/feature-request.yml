@@ -1,0 +1,65 @@
+name: Feature request
+description: Suggest a focused improvement for SC220 Live, its public website, or documentation.
+title: "[Feature]: "
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Describe the user problem first. Requests are evaluated against clarity, safety, audio reliability, and usefulness for the broader SC220 Live audience.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Audio workflow or routing
+        - Mixer controls
+        - DSP or sound workflow
+        - Metering or visual feedback
+        - OBS / TikTok Live integration
+        - Installer or update experience
+        - Landing page or documentation
+        - Accessibility or localization
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem to solve
+      description: Explain the current difficulty and who experiences it.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: Describe the desired behavior without assuming a specific internal implementation.
+    validations:
+      required: true
+
+  - type: textarea
+    id: workflow
+    attributes:
+      label: Example workflow
+      placeholder: Explain the steps before and after the proposed change.
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Mention existing workarounds or other approaches you tried.
+
+  - type: checkboxes
+    id: scope
+    attributes:
+      label: Scope confirmation
+      options:
+        - label: This request does not require publishing private source code, credentials, signing keys, or proprietary DSP implementation details.
+          required: true
+        - label: I checked existing issues for a similar request.
+          required: true
