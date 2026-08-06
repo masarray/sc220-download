@@ -1,0 +1,11 @@
+{
+  "name": "SC220 Live",
+  "short_name": "SC220 Live",
+  "description": "Windows audio console for Recording Tech SC220, karaoke and live streaming.",
+  "start_url": "/sc220-download/",
+  "scope": "/sc220-download/",
+  "display": "browser",
+  "background_color": "#121313",
+  "theme_color": "#121313",
+  "icons": []
+}
