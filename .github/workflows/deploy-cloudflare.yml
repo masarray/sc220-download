@@ -20,7 +20,6 @@ jobs:
     env:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       # Cloudflare Account ID is an account identifier, not an authentication secret.
-      # Keeping it here avoids requiring a second repository secret.
       CLOUDFLARE_ACCOUNT_ID: c5f2d99976a89c1825c36dc6ae061ca0
     steps:
       - name: Checkout public distribution repository
@@ -53,11 +52,42 @@ jobs:
             npx --yes wrangler@latest pages project create sc220 --production-branch=main
           fi
 
-      - name: Deploy sc220.pages.dev
+      - name: Deploy sc220.pages.dev with latest Wrangler
         if: steps.credentials.outputs.ready == 'true'
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: c5f2d99976a89c1825c36dc6ae061ca0
-          command: pages deploy dist --project-name=sc220 --branch=main
-          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx --yes wrangler@latest pages deploy dist \
+            --project-name=sc220 \
+            --branch=main \
+            --commit-dirty=true
+
+      - name: Verify production origin and SEO signals
+        if: steps.credentials.outputs.ready == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          origin="https://sc220.pages.dev"
+          mkdir -p /tmp/sc220-smoke
+
+          fetch() {
+            local path="$1"
+            local output="$2"
+            echo "Checking ${origin}${path}"
+            curl --fail --location --silent --show-error \
+              --retry 10 --retry-delay 3 --retry-all-errors \
+              --connect-timeout 10 --max-time 30 \
+              "${origin}${path}" -o "$output"
+          }
+
+          fetch "/" /tmp/sc220-smoke/index.html
+          fetch "/en/" /tmp/sc220-smoke/en.html
+          fetch "/sitemap.xml" /tmp/sc220-smoke/sitemap.xml
+          fetch "/robots.txt" /tmp/sc220-smoke/robots.txt
+
+          grep -Fq 'rel="canonical" href="https://sc220.pages.dev/"' /tmp/sc220-smoke/index.html
+          grep -Fq 'rel="canonical" href="https://sc220.pages.dev/en/"' /tmp/sc220-smoke/en.html
+          grep -Fq '<loc>https://sc220.pages.dev/' /tmp/sc220-smoke/sitemap.xml
+          grep -Fq 'Sitemap: https://sc220.pages.dev/sitemap.xml' /tmp/sc220-smoke/robots.txt
+
+          echo "Production smoke test passed: sc220.pages.dev is live with canonical SEO signals."
