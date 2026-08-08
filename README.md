@@ -10,11 +10,11 @@
   [![GitHub Pages](https://github.com/masarray/sc220-download/actions/workflows/deploy-pages.yml/badge.svg)](https://github.com/masarray/sc220-download/actions/workflows/deploy-pages.yml)
   [![Official distribution](https://img.shields.io/badge/distribution-official-2ea44f)](#repository-scope)
 
-  [Website](https://masarray.github.io/sc220-download/) · [Download](https://github.com/masarray/sc220-download/releases/latest) · [Setup](#quick-start) · [Support](SUPPORT.md) · [Bahasa Indonesia](README.id.md)
+  [Website](https://sc220.pages.dev/) · [Download](https://sc220.pages.dev/en/download/) · [Setup](#quick-start) · [Support](SUPPORT.md) · [Bahasa Indonesia](README.id.md)
 </div>
 
 <p align="center">
-  <a href="https://masarray.github.io/sc220-download/">
+  <a href="https://sc220.pages.dev/">
     <img src="sc220-live-console.png" alt="SC220 Live Windows mixer interface with SC220 input, PC audio, DSP, meters, and streaming output" width="960">
   </a>
 </p>
@@ -51,7 +51,7 @@ flowchart LR
     F --> G[OBS Studio / TikTok Live Studio]
 ```
 
-SC220 Live is **not** control software for Recording Tech KTV Pro K500. For a clear explanation of how a karaoke processor, audio interface, and Windows mixer differ, see the [KTV Pro K500 karaoke processor guide](https://masarray.github.io/sc220-download/en/ktv-k500-karaoke-processor/).
+SC220 Live is **not** control software for Recording Tech KTV Pro K500. For a clear explanation of how a karaoke processor, audio interface, and Windows mixer differ, see the [KTV Pro K500 karaoke processor guide](https://sc220.pages.dev/en/ktv-k500-karaoke-processor/).
 
 ## Download
 
@@ -59,10 +59,11 @@ The current stable release is **SC220 Live v0.1.0** for Windows 10/11 x64.
 
 | Item | Official link |
 |---|---|
+| Official download page | [sc220.pages.dev/en/download](https://sc220.pages.dev/en/download/) |
 | Windows installer | [Download latest release](https://github.com/masarray/sc220-download/releases/latest) |
 | Release notes | [RELEASE_NOTES_v0.1.0.md](RELEASE_NOTES_v0.1.0.md) |
 | Machine-readable metadata | [latest.json](latest.json) |
-| Product website | [masarray.github.io/sc220-download](https://masarray.github.io/sc220-download/) |
+| Product website | [sc220.pages.dev](https://sc220.pages.dev/) |
 
 ### Verify the installer
 
@@ -85,7 +86,7 @@ The result must match the published checksum exactly. Release assets also includ
 
 ## Quick start
 
-1. Download the installer from the [latest GitHub release](https://github.com/masarray/sc220-download/releases/latest).
+1. Open the [official SC220 Live download page](https://sc220.pages.dev/en/download/) and download the installer from GitHub Releases.
 2. Verify the SHA-256 checksum before installation.
 3. Install or configure a compatible virtual audio cable when your streaming workflow requires one.
 4. In SC220 Live, select the real SC220 input device and the desired Windows playback source.
@@ -109,7 +110,7 @@ This public repository contains:
 - Official release metadata and user-facing release notes.
 - Versioned installer assets, checksums, and manifests.
 - Public support, security, and contribution documentation.
-- GitHub Pages deployment automation.
+- Cloudflare Pages deployment automation plus the GitHub Pages mirror.
 
 It does **not** contain:
 

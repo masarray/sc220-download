@@ -9,11 +9,11 @@
   [![Windows 10/11](https://img.shields.io/badge/Windows-10%20%2F%2011%20x64-0078D6?logo=windows11&logoColor=white)](#persyaratan-sistem)
   [![GitHub Pages](https://github.com/masarray/sc220-download/actions/workflows/deploy-pages.yml/badge.svg)](https://github.com/masarray/sc220-download/actions/workflows/deploy-pages.yml)
 
-  [Website](https://masarray.github.io/sc220-download/) · [Unduh](https://github.com/masarray/sc220-download/releases/latest) · [Mulai](#cara-mulai) · [Dukungan](SUPPORT.md) · [English](README.md)
+  [Website](https://sc220.pages.dev/) · [Unduh](https://sc220.pages.dev/download/) · [Mulai](#cara-mulai) · [Dukungan](SUPPORT.md) · [English](README.md)
 </div>
 
 <p align="center">
-  <a href="https://masarray.github.io/sc220-download/">
+  <a href="https://sc220.pages.dev/">
     <img src="sc220-live-console.png" alt="Tampilan mixer Windows SC220 Live dengan input SC220, audio PC, DSP, meter, dan output streaming" width="960">
   </a>
 </p>
@@ -50,7 +50,7 @@ flowchart LR
     F --> G[OBS Studio / TikTok Live Studio]
 ```
 
-SC220 Live **bukan** software kontrol Recording Tech KTV Pro K500. Penjelasan perbedaan karaoke processor, audio interface, dan mixer Windows tersedia pada [panduan KTV Pro K500](https://masarray.github.io/sc220-download/ktv-k500-karaoke-processor/).
+SC220 Live **bukan** software kontrol Recording Tech KTV Pro K500. Penjelasan perbedaan karaoke processor, audio interface, dan mixer Windows tersedia pada [panduan KTV Pro K500](https://sc220.pages.dev/ktv-k500-karaoke-processor/).
 
 ## Unduh
 
@@ -58,10 +58,11 @@ Rilis stabil saat ini adalah **SC220 Live v0.1.0** untuk Windows 10/11 x64.
 
 | Item | Tautan resmi |
 |---|---|
+| Halaman download resmi | [sc220.pages.dev/download](https://sc220.pages.dev/download/) |
 | Installer Windows | [Unduh rilis terbaru](https://github.com/masarray/sc220-download/releases/latest) |
 | Catatan rilis | [RELEASE_NOTES_v0.1.0.md](RELEASE_NOTES_v0.1.0.md) |
 | Metadata machine-readable | [latest.json](latest.json) |
-| Website produk | [masarray.github.io/sc220-download](https://masarray.github.io/sc220-download/) |
+| Website produk | [sc220.pages.dev](https://sc220.pages.dev/) |
 
 ### Verifikasi installer
 
@@ -84,7 +85,7 @@ Hasilnya harus sama persis dengan checksum yang dipublikasikan. Aset rilis juga 
 
 ## Cara mulai
 
-1. Unduh installer dari [GitHub Release terbaru](https://github.com/masarray/sc220-download/releases/latest).
+1. Buka [halaman download resmi SC220 Live](https://sc220.pages.dev/download/) dan unduh installer dari GitHub Release.
 2. Verifikasi checksum SHA-256 sebelum instalasi.
 3. Instal atau atur virtual audio cable yang kompatibel bila diperlukan oleh alur streaming.
 4. Pilih perangkat input SC220 yang benar dan sumber playback Windows di SC220 Live.
@@ -108,7 +109,7 @@ Repository publik ini memuat:
 - Metadata rilis resmi dan catatan rilis pengguna.
 - Installer versioned, checksum, dan manifest.
 - Dokumentasi support, security, dan kontribusi publik.
-- Otomasi deployment GitHub Pages.
+- Otomasi deployment Cloudflare Pages dan GitHub Pages mirror.
 
 Repository ini tidak memuat:
 

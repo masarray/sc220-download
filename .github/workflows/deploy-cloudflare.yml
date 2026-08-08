@@ -71,12 +71,23 @@ jobs:
 
           fetch "/" /tmp/sc220-smoke/index.html
           fetch "/en/" /tmp/sc220-smoke/en.html
+          fetch "/download/" /tmp/sc220-smoke/download.html
+          fetch "/en/download/" /tmp/sc220-smoke/download-en.html
+          fetch "/sc220-mkii-audio-interface/support/" /tmp/sc220-smoke/support.html
           fetch "/sitemap.xml" /tmp/sc220-smoke/sitemap.xml
           fetch "/robots.txt" /tmp/sc220-smoke/robots.txt
+          fetch "/app.js" /tmp/sc220-smoke/app.js
 
           grep -Fq 'rel="canonical" href="https://sc220.pages.dev/"' /tmp/sc220-smoke/index.html
           grep -Fq 'rel="canonical" href="https://sc220.pages.dev/en/"' /tmp/sc220-smoke/en.html
-          grep -Fq '<loc>https://sc220.pages.dev/' /tmp/sc220-smoke/sitemap.xml
+          grep -Fq 'rel="canonical" href="https://sc220.pages.dev/download/"' /tmp/sc220-smoke/download.html
+          grep -Fq 'rel="canonical" href="https://sc220.pages.dev/en/download/"' /tmp/sc220-smoke/download-en.html
+          grep -Fq '"@type":"SoftwareApplication"' /tmp/sc220-smoke/download.html
+          grep -Fq '"offers":{"@type":"Offer","price":"0"' /tmp/sc220-smoke/download.html
+          grep -Fq '<title>Driver & Support Recording Tech SC220 MKII – Windows 10/11</title>' /tmp/sc220-smoke/support.html
+          grep -Fq '<loc>https://sc220.pages.dev/download/</loc>' /tmp/sc220-smoke/sitemap.xml
+          grep -Fq '<loc>https://sc220.pages.dev/en/download/</loc>' /tmp/sc220-smoke/sitemap.xml
           grep -Fq 'Sitemap: https://sc220.pages.dev/sitemap.xml' /tmp/sc220-smoke/robots.txt
+          grep -Fq 'const siteBase = isGitHubPagesMirror ? "/sc220-download/" : "/";' /tmp/sc220-smoke/app.js
 
-          echo "Production smoke test passed: sc220.pages.dev is live with canonical SEO signals."
+          echo "Production smoke test passed: download intent, driver/support intent, canonical SEO, sitemap, and dual-origin routing are live."

@@ -1,0 +1,9 @@
+/
+  Link: </styles.css>; rel=preload; as=style, </seo.css>; rel=preload; as=style, </sc220-live-console.png>; rel=preload; as=image
+
+/en/
+  Link: </styles.css>; rel=preload; as=style, </seo.css>; rel=preload; as=style, </sc220-live-console.png>; rel=preload; as=image
+
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
