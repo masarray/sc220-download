@@ -39,19 +39,8 @@ jobs:
             echo "Cloudflare deployment is prepared but skipped until CLOUDFLARE_API_TOKEN is configured as a repository secret."
           fi
 
-      - name: Ensure sc220 Pages project exists
-        if: steps.credentials.outputs.ready == 'true'
-        shell: bash
-        run: |
-          set -euo pipefail
-          projects="$(npx --yes wrangler@latest pages project list --json)"
-          if printf '%s' "$projects" | jq -e '.[] | select(.name == "sc220")' >/dev/null; then
-            echo "Cloudflare Pages project 'sc220' already exists."
-          else
-            echo "Creating Cloudflare Pages project 'sc220' with main as production branch."
-            npx --yes wrangler@latest pages project create sc220 --production-branch=main
-          fi
-
+      # Project bootstrap was completed on the first production run. Routine deploys
+      # intentionally target the existing `sc220` project instead of trying to create it.
       - name: Deploy sc220.pages.dev with latest Wrangler
         if: steps.credentials.outputs.ready == 'true'
         shell: bash
