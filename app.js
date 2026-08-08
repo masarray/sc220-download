@@ -12,6 +12,9 @@
   const isEnglish = html.lang.toLowerCase().startsWith("en");
   const locale = isEnglish ? "en-US" : "id-ID";
   const releaseSource = html.dataset.releaseSource || "latest.json";
+  const normalizedPath = window.location.pathname.replace(/\/+$/, "/") || "/";
+  const isGitHubPagesMirror = normalizedPath.startsWith("/sc220-download/");
+  const siteBase = isGitHubPagesMirror ? "/sc220-download/" : "/";
 
   const copyLabels = isEnglish
     ? { idle: "Copy", done: "Copied", templateDone: "Template copied" }
@@ -106,8 +109,7 @@
   };
 
   const installHardwareGuidePromo = () => {
-    const path = window.location.pathname.replace(/\/+$/, "/");
-    const isLandingPage = /\/sc220-download\/(?:en\/)?$/.test(path);
+    const isLandingPage = /^(?:\/|\/en\/|\/sc220-download\/|\/sc220-download\/en\/)$/.test(normalizedPath);
     if (!isLandingPage || document.querySelector(".hardware-guide-section")) return;
 
     const guideHref = "sc220-mkii-audio-interface/";
@@ -132,8 +134,8 @@
     section.className = "hardware-guide-section";
     section.setAttribute("aria-labelledby", "sc220-mkii-guide-title");
     section.innerHTML = isEnglish
-      ? `<div class="hardware-guide-shell"><div><p class="kicker dark"><span></span> SC220 MKII HARDWARE GUIDE</p><h2 id="sc220-mkii-guide-title">Understand the interface before connecting it.</h2><p>Read public specifications, control functions, wiring, compatibility status, goal-based setup, gain staging, and a complete support checklist.</p></div><article class="hardware-guide-card"><small>RECORDING TECH SC220 MKII / MK2</small><ul><li>Public hardware claims and verification status</li><li>Microphone, instrument, processor, and streaming routes</li><li>Goal-based setup and gain staging</li><li>Diagnostic checklist and issue template</li></ul><a href="${guideHref}">Open the hardware guide <span aria-hidden="true">→</span></a><div class="hardware-subnav"><a href="${setupHref}">Setup by goal</a><a href="${supportHref}">Support checklist</a></div></article></div>`
-      : `<div class="hardware-guide-shell"><div><p class="kicker dark"><span></span> PANDUAN HARDWARE SC220 MKII</p><h2 id="sc220-mkii-guide-title">Pahami audio interface sebelum menyambungkannya.</h2><p>Pelajari spesifikasi publik, fungsi kontrol, wiring, status kompatibilitas, setup berdasarkan tujuan, gain staging, dan checklist support lengkap.</p></div><article class="hardware-guide-card"><small>RECORDING TECH SC220 MKII / MK2</small><ul><li>Klaim hardware publik dan status verifikasi</li><li>Rute microphone, instrumen, processor, dan streaming</li><li>Setup berdasarkan tujuan dan gain staging</li><li>Checklist diagnosis dan template issue</li></ul><a href="${guideHref}">Buka panduan hardware <span aria-hidden="true">→</span></a><div class="hardware-subnav"><a href="${setupHref}">Setup berdasarkan tujuan</a><a href="${supportHref}">Checklist support</a></div></article></div>`;
+      ? `<div class="hardware-guide-shell"><div><p class="kicker dark"><span></span> SC220 MKII HARDWARE GUIDE</p><h2 id="sc220-mkii-guide-title">Understand the interface before connecting it.</h2><p>Read public specifications, control functions, wiring, compatibility status, goal-based setup, gain staging, and a complete support checklist.</p></div><article class="hardware-guide-card"><small>RECORDING TECH SC220 MKII / MK2</small><ul><li>Public hardware claims and verification status</li><li>Microphone, instrument, processor, and streaming routes</li><li>Goal-based setup and gain staging</li><li>Diagnostic checklist and issue template</li></ul><a href="${guideHref}">Open the hardware guide <span aria-hidden="true">→</span></a><div class="hardware-subnav"><a href="${setupHref}">Setup by goal</a><a href="${supportHref}">Driver & support</a></div></article></div>`
+      : `<div class="hardware-guide-shell"><div><p class="kicker dark"><span></span> PANDUAN HARDWARE SC220 MKII</p><h2 id="sc220-mkii-guide-title">Pahami audio interface sebelum menyambungkannya.</h2><p>Pelajari spesifikasi publik, fungsi kontrol, wiring, status kompatibilitas, setup berdasarkan tujuan, gain staging, dan checklist support lengkap.</p></div><article class="hardware-guide-card"><small>RECORDING TECH SC220 MKII / MK2</small><ul><li>Klaim hardware publik dan status verifikasi</li><li>Rute microphone, instrumen, processor, dan streaming</li><li>Setup berdasarkan tujuan dan gain staging</li><li>Checklist diagnosis dan template issue</li></ul><a href="${guideHref}">Buka panduan hardware <span aria-hidden="true">→</span></a><div class="hardware-subnav"><a href="${setupHref}">Setup berdasarkan tujuan</a><a href="${supportHref}">Driver & support</a></div></article></div>`;
 
     const k500Section = document.querySelector(".topic-section");
     const setupSection = document.querySelector(".setup-section");
@@ -142,9 +144,8 @@
   };
 
   const installP1GuidePromo = () => {
-    const path = window.location.pathname.replace(/\/+$/, "/");
-    const isIdGuide = /\/sc220-download\/sc220-mkii-audio-interface\/$/.test(path);
-    const isEnGuide = /\/sc220-download\/en\/sc220-mkii-audio-interface\/$/.test(path);
+    const isIdGuide = /^(?:\/sc220-mkii-audio-interface\/|\/sc220-download\/sc220-mkii-audio-interface\/)$/.test(normalizedPath);
+    const isEnGuide = /^(?:\/en\/sc220-mkii-audio-interface\/|\/sc220-download\/en\/sc220-mkii-audio-interface\/)$/.test(normalizedPath);
     if ((!isIdGuide && !isEnGuide) || document.querySelector(".p1-guide-promo")) return;
 
     const stylesheetHref = isEnGuide ? "../../sc220-mkii-p1.css" : "../sc220-mkii-p1.css";
@@ -159,15 +160,15 @@
       const supportLink = document.createElement("a");
       supportLink.href = "support/";
       supportLink.dataset.p1Support = "";
-      supportLink.textContent = "Support";
+      supportLink.textContent = isEnGuide ? "Driver & support" : "Driver & support";
       guideNav.append(setupLink, supportLink);
     }
 
     const promo = document.createElement("section");
     promo.className = "p1-guide-promo";
     promo.innerHTML = isEnGuide
-      ? `<div class="p1-shell"><div><h2>Continue with a goal-based setup or diagnostic checklist.</h2><p>Separate hardware gain, monitoring, software mixing, and broadcast output before troubleshooting.</p></div><div class="p1-guide-links"><a href="setup/">Open setup guide</a><a href="support/">Open support checklist</a></div></div>`
-      : `<div class="p1-shell"><div><h2>Lanjutkan ke setup berdasarkan tujuan atau checklist diagnosis.</h2><p>Pisahkan gain hardware, monitoring, mix software, dan output siaran sebelum melakukan troubleshooting.</p></div><div class="p1-guide-links"><a href="setup/">Buka cara setting</a><a href="support/">Buka checklist support</a></div></div>`;
+      ? `<div class="p1-shell"><div><h2>Continue with a goal-based setup or driver and diagnostic checklist.</h2><p>Separate hardware gain, Windows device detection, monitoring, software mixing, and broadcast output before troubleshooting.</p></div><div class="p1-guide-links"><a href="setup/">Open setup guide</a><a href="support/">Open driver & support</a></div></div>`
+      : `<div class="p1-shell"><div><h2>Lanjutkan ke setup berdasarkan tujuan atau panduan driver dan diagnosis.</h2><p>Pisahkan gain hardware, deteksi perangkat Windows, monitoring, mix software, dan output siaran sebelum troubleshooting.</p></div><div class="p1-guide-links"><a href="setup/">Buka cara setting</a><a href="support/">Buka driver & support</a></div></div>`;
 
     const sourceSection = document.querySelector("#sumber");
     const footer = document.querySelector("footer");
@@ -201,8 +202,8 @@
   installHardwareGuidePromo();
   installP1GuidePromo();
 
-  // Always append the unified refinement after every static and injected base stylesheet.
-  ensureStylesheet("/sc220-download/site-refinement.css?v=20260807-1");
+  // Keep a single refinement stylesheet path working on both Cloudflare root and GitHub Pages mirror.
+  ensureStylesheet(`${siteBase}site-refinement.css?v=20260808-2`);
 
   document.querySelectorAll("[data-year]").forEach((node) => {
     node.textContent = String(new Date().getFullYear());
