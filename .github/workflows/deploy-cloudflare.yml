@@ -1,0 +1,61 @@
+name: Deploy SC220 Live to Cloudflare Pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  deployments: write
+
+concurrency:
+  group: cloudflare-pages-production
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - name: Checkout public distribution repository
+        uses: actions/checkout@v6
+
+      - name: Build Cloudflare static site
+        run: bash scripts/build-static-site.sh cloudflare
+
+      - name: Check Cloudflare credentials
+        id: credentials
+        shell: bash
+        run: |
+          if [[ -n "$CLOUDFLARE_API_TOKEN" && -n "$CLOUDFLARE_ACCOUNT_ID" ]]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "Cloudflare deployment is prepared but skipped until CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID are configured as repository secrets."
+          fi
+
+      - name: Ensure sc220 Pages project exists
+        if: steps.credentials.outputs.ready == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          projects="$(npx --yes wrangler@latest pages project list --json)"
+          if printf '%s' "$projects" | jq -e '.[] | select(.name == "sc220")' >/dev/null; then
+            echo "Cloudflare Pages project 'sc220' already exists."
+          else
+            echo "Creating Cloudflare Pages project 'sc220' with main as production branch."
+            npx --yes wrangler@latest pages project create sc220 --production-branch=main
+          fi
+
+      - name: Deploy sc220.pages.dev
+        if: steps.credentials.outputs.ready == 'true'
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy dist --project-name=sc220 --branch=main
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
