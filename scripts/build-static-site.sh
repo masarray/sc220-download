@@ -17,12 +17,13 @@ rm -rf dist
 mkdir -p dist
 
 # Keep the public site identical on both origins while excluding repository-only files.
-rsync -a ./ dist/ \
+rsync -a \
   --exclude '.git/' \
   --exclude '.github/' \
   --exclude 'dist/' \
   --exclude 'scripts/' \
-  --exclude '*.md'
+  --exclude '*.md' \
+  ./ dist/
 
 # sc220.pages.dev is the single SEO authority. The GitHub Pages copy deliberately
 # publishes the same canonical/hreflang/schema URLs so search engines consolidate
