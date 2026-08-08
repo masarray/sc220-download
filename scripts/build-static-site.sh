@@ -119,13 +119,13 @@ replace_once(
 )
 replace_once(
     "dist/sc220-mkii-audio-interface/support/index.html",
-    '<meta property="og:title" content="Recording Tech SC220 MKII Support">',
+    '<meta property="og:title" content="Support Recording Tech SC220 MKII">',
     '<meta property="og:title" content="Driver & Support Recording Tech SC220 MKII">',
     "id support og title",
 )
 replace_once(
     "dist/sc220-mkii-audio-interface/support/index.html",
-    '<meta name="twitter:title" content="SC220 MKII Support">',
+    '<meta name="twitter:title" content="Support SC220 MKII">',
     '<meta name="twitter:title" content="SC220 MKII Driver & Support">',
     "id support twitter title",
 )
