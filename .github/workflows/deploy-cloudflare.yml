@@ -1,0 +1,63 @@
+name: Deploy SC220 Live to Cloudflare Pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  deployments: write
+
+concurrency:
+  group: cloudflare-pages-production
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      # Cloudflare Account ID is an account identifier, not an authentication secret.
+      # Keeping it here avoids requiring a second repository secret.
+      CLOUDFLARE_ACCOUNT_ID: c5f2d99976a89c1825c36dc6ae061ca0
+    steps:
+      - name: Checkout public distribution repository
+        uses: actions/checkout@v6
+
+      - name: Build Cloudflare static site
+        run: bash scripts/build-static-site.sh cloudflare
+
+      - name: Check Cloudflare API token
+        id: credentials
+        shell: bash
+        run: |
+          if [[ -n "$CLOUDFLARE_API_TOKEN" ]]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "Cloudflare deployment is prepared but skipped until CLOUDFLARE_API_TOKEN is configured as a repository secret."
+          fi
+
+      - name: Ensure sc220 Pages project exists
+        if: steps.credentials.outputs.ready == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          projects="$(npx --yes wrangler@latest pages project list --json)"
+          if printf '%s' "$projects" | jq -e '.[] | select(.name == "sc220")' >/dev/null; then
+            echo "Cloudflare Pages project 'sc220' already exists."
+          else
+            echo "Creating Cloudflare Pages project 'sc220' with main as production branch."
+            npx --yes wrangler@latest pages project create sc220 --production-branch=main
+          fi
+
+      - name: Deploy sc220.pages.dev
+        if: steps.credentials.outputs.ready == 'true'
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: c5f2d99976a89c1825c36dc6ae061ca0
+          command: pages deploy dist --project-name=sc220 --branch=main
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
