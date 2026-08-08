@@ -41,8 +41,9 @@ if [[ "$TARGET" == "cloudflare" && -f dist/site.webmanifest ]]; then
 fi
 
 # Fail the build if an old absolute SEO origin leaks into the deployable site.
-if grep -R --line-number --fixed-strings "$LEGACY_ORIGIN" dist \
-  --include='*.html' --include='*.xml' --include='*.txt' --include='*.webmanifest'; then
+if grep -R --line-number --fixed-strings \
+  --include='*.html' --include='*.xml' --include='*.txt' --include='*.webmanifest' \
+  "$LEGACY_ORIGIN" dist; then
   echo "Legacy canonical origin is still present in dist/." >&2
   exit 1
 fi
