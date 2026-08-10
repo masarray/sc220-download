@@ -1,0 +1,203 @@
+name: Publish verified SC220 draft release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Semantic version of the existing draft release
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sc220-public-release
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      REPOSITORY: ${{ github.repository }}
+      VERSION: ${{ inputs.version }}
+    steps:
+      - name: Checkout public distribution repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Validate version and public repository boundary
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Invalid semantic version: $VERSION" >&2
+            exit 1
+          fi
+
+          forbidden_repo_files="$(
+            find . -path './.git' -prune -o -type f \
+              \( -iname '*.c' -o -iname '*.cc' -o -iname '*.cpp' -o -iname '*.cxx' \
+                 -o -iname '*.h' -o -iname '*.hh' -o -iname '*.hpp' -o -iname '*.cmake' \
+                 -o -iname '*.dll' -o -iname '*.pdb' -o -iname '*.obj' -o -iname '*.lib' \
+                 -o -iname '*.exp' -o -iname '*.pfx' -o -iname '*.p12' -o -iname '*.pem' \
+                 -o -iname '*.key' -o -name 'CMakeLists.txt' -o -name '.gitmodules' \) \
+              -print
+          )"
+          if [[ -n "$forbidden_repo_files" ]]; then
+            echo "Public repository boundary violation:" >&2
+            echo "$forbidden_repo_files" >&2
+            exit 1
+          fi
+
+          if grep -RIlE --exclude-dir=.git --exclude=publish-draft-release.yml \
+            'third_party[/\\]askp-vst|PluginProcessor\.(cpp|h)|PluginEditor\.(cpp|h)|BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY' \
+            .; then
+            echo "Private ASK-P source or key material was found in the public repository." >&2
+            exit 1
+          fi
+
+      - name: Download and validate draft assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="v$VERSION"
+          installer="SC220-Live-v$VERSION-Setup-win-x64.exe"
+          checksum="$installer.sha256"
+          manifest="SC220-Live-v$VERSION-Setup-win-x64.manifest.json"
+          expected=(
+            "$installer"
+            "$checksum"
+            "$manifest"
+            "BUILD_COMMIT.txt"
+            "VC_REDIST_X64_SHA256.txt"
+            "VB_CABLE_PACK45_SHA256.txt"
+          )
+
+          release_json="$(gh api "repos/$REPOSITORY/releases/tags/$tag")"
+          if [[ "$(jq -r '.draft' <<<"$release_json")" != "true" ]]; then
+            echo "$tag must exist as a draft release before this workflow runs." >&2
+            exit 1
+          fi
+
+          mapfile -t actual < <(jq -r '.assets[].name' <<<"$release_json" | sort)
+          mapfile -t wanted < <(printf '%s\n' "${expected[@]}" | sort)
+          if [[ "${actual[*]}" != "${wanted[*]}" ]]; then
+            echo "Draft assets do not match the binary-only allowlist." >&2
+            printf 'Expected: %s\n' "${wanted[*]}" >&2
+            printf 'Actual:   %s\n' "${actual[*]}" >&2
+            exit 1
+          fi
+
+          mkdir release-assets
+          gh release download "$tag" --repo "$REPOSITORY" --dir release-assets
+          cd release-assets
+
+          expected_hash="$(awk '{print tolower($1)}' "$checksum")"
+          actual_hash="$(sha256sum "$installer" | awk '{print $1}')"
+          [[ "$expected_hash" =~ ^[0-9a-f]{64}$ ]]
+          [[ "$actual_hash" == "$expected_hash" ]]
+          grep -Fq "$installer" "$checksum"
+
+          jq -e --arg version "$VERSION" --arg file "$installer" --arg hash "$actual_hash" '
+            .product == "SC220 Live" and
+            .version == $version and
+            .installer_file == $file and
+            (.source_commit | test("^[0-9a-fA-F]{40}$")) and
+            (.installer_sha256 | ascii_downcase) == $hash and
+            (.vc_runtime.sha256 | test("^[0-9a-fA-F]{64}$")) and
+            (.vb_cable.sha256 | test("^[0-9a-fA-F]{64}$"))
+          ' "$manifest" >/dev/null
+
+          build_commit="$(tr -d '\r\n ' < BUILD_COMMIT.txt | tr '[:upper:]' '[:lower:]')"
+          vc_hash="$(tr -d '\r\n ' < VC_REDIST_X64_SHA256.txt | tr '[:upper:]' '[:lower:]')"
+          vb_hash="$(tr -d '\r\n ' < VB_CABLE_PACK45_SHA256.txt | tr '[:upper:]' '[:lower:]')"
+          [[ "$build_commit" =~ ^[0-9a-f]{40}$ ]]
+          [[ "$vc_hash" =~ ^[0-9a-f]{64}$ ]]
+          [[ "$vb_hash" =~ ^[0-9a-f]{64}$ ]]
+          [[ "$build_commit" == "$(jq -r '.source_commit | ascii_downcase' "$manifest")" ]]
+          [[ "$vc_hash" == "$(jq -r '.vc_runtime.sha256 | ascii_downcase' "$manifest")" ]]
+          [[ "$vb_hash" == "$(jq -r '.vb_cable.sha256 | ascii_downcase' "$manifest")" ]]
+
+          if command -v 7z >/dev/null 2>&1; then
+            7z l -slt "$installer" > installer-contents.txt
+            if grep -Ei '\.(c|cc|cpp|cxx|h|hh|hpp|cmake|pdb|obj|lib|exp)([[:space:]]|$)|CMakeLists\.txt|\.gitmodules' installer-contents.txt; then
+              echo "Source or debug material was embedded in the installer." >&2
+              exit 1
+            fi
+          fi
+
+          if strings -a "$installer" | grep -Ei \
+            'third_party[/\\]askp-vst|PluginProcessor\.(cpp|h)|PluginEditor\.(cpp|h)|BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY'; then
+            echo "Private ASK-P source path or key material was found in the installer." >&2
+            exit 1
+          fi
+
+          echo "INSTALLER=$installer" >> "$GITHUB_ENV"
+          echo "INSTALLER_SHA256=$actual_hash" >> "$GITHUB_ENV"
+          echo "MANIFEST=$manifest" >> "$GITHUB_ENV"
+          echo "SOURCE_COMMIT=$build_commit" >> "$GITHUB_ENV"
+
+      - name: Prepare public release metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="v$VERSION"
+          release_base="https://github.com/$REPOSITORY/releases/download/$tag"
+          published="$(date -u +%F)"
+
+          jq -n \
+            --arg version "$VERSION" \
+            --arg published "$published" \
+            --arg download "$release_base/$INSTALLER" \
+            --arg sha256 "$INSTALLER_SHA256" \
+            --arg checksum "$release_base/$INSTALLER.sha256" \
+            --arg manifest "$release_base/$MANIFEST" \
+            --arg source_commit "$SOURCE_COMMIT" \
+            '{
+              product: "SC220 Live",
+              version: $version,
+              published: $published,
+              platform: "windows-x64",
+              status: "stable",
+              download: $download,
+              sha256: $sha256,
+              checksum: $checksum,
+              manifest: $manifest,
+              source_commit: $source_commit,
+              smart_installer: true,
+              vc_runtime_bundled: true,
+              vb_cable_optional: true
+            }' > latest.json
+
+          gh release view "$tag" --repo "$REPOSITORY" --json body --jq '.body' \
+            > "RELEASE_NOTES_v$VERSION.md"
+
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add latest.json "RELEASE_NOTES_v$VERSION.md"
+          if ! git diff --cached --quiet; then
+            git commit -m "release: point website to SC220 Live $tag"
+          fi
+
+      - name: Publish verified draft and update public site
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="v$VERSION"
+          gh release edit "$tag" --repo "$REPOSITORY" --draft=false --latest
+          git push origin HEAD:main
+
+      - name: Verify published release
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="v$VERSION"
+          published="$(gh release view "$tag" --repo "$REPOSITORY" --json isDraft,isLatest,assets)"
+          [[ "$(jq -r '.isDraft' <<<"$published")" == "false" ]]
+          [[ "$(jq -r '.isLatest' <<<"$published")" == "true" ]]
+          [[ "$(jq -r --arg file "$INSTALLER" '.assets[] | select(.name == $file) | .digest' <<<"$published")" == "sha256:$INSTALLER_SHA256" ]]
+
+          echo "Published $tag with verified binary-only assets."
