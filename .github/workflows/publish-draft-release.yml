@@ -39,8 +39,8 @@ jobs:
           $installerName = "SC220-Live-v$env:VERSION-Setup-win-x64.exe"
           $releases = gh api "repos/$env:REPOSITORY/releases?per_page=100" | ConvertFrom-Json
           if ($LASTEXITCODE -ne 0) { throw 'Unable to enumerate draft releases.' }
-          $release = @($releases | Where-Object { $_.tag_name -eq $tag -and $_.draft }) | Select-Object -First 1
-          if (-not $release) { throw "$tag must exist as a draft release." }
+          $release = @($releases | Where-Object { $_.tag_name -eq $tag }) | Select-Object -First 1
+          if (-not $release) { throw "$tag release does not exist." }
           $asset = @($release.assets | Where-Object { $_.name -eq $installerName }) | Select-Object -First 1
           if (-not $asset -or $asset.digest -notmatch '^sha256:[0-9a-f]{64}$') {
             throw 'Draft installer or its GitHub digest is missing.'
@@ -223,11 +223,11 @@ jobs:
           releases_json="$(gh api "repos/$REPOSITORY/releases?per_page=100")"
           release_json="$(
             jq -c --arg tag "$tag" \
-              '.[] | select(.tag_name == $tag and .draft == true)' \
+              '.[] | select(.tag_name == $tag)' \
               <<<"$releases_json"
           )"
-          if [[ -z "$release_json" || "$(jq -r '.draft' <<<"$release_json")" != "true" ]]; then
-            echo "$tag must exist as a draft release before this workflow runs." >&2
+          if [[ -z "$release_json" ]]; then
+            echo "$tag release does not exist." >&2
             exit 1
           fi
 
@@ -285,6 +285,7 @@ jobs:
           echo "INSTALLER_SHA256=$actual_hash" >> "$GITHUB_ENV"
           echo "MANIFEST=$manifest" >> "$GITHUB_ENV"
           echo "SOURCE_COMMIT=$build_commit" >> "$GITHUB_ENV"
+          echo "RELEASE_IS_DRAFT=$(jq -r '.draft' <<<"$release_json")" >> "$GITHUB_ENV"
 
       - name: Prepare public release metadata
         shell: bash
@@ -333,7 +334,9 @@ jobs:
         run: |
           set -euo pipefail
           tag="v$VERSION"
-          gh release edit "$tag" --repo "$REPOSITORY" --draft=false --latest
+          if [[ "$RELEASE_IS_DRAFT" == "true" ]]; then
+            gh release edit "$tag" --repo "$REPOSITORY" --draft=false --latest
+          fi
           git push origin HEAD:main
 
       - name: Verify published release
@@ -341,9 +344,11 @@ jobs:
         run: |
           set -euo pipefail
           tag="v$VERSION"
-          published="$(gh release view "$tag" --repo "$REPOSITORY" --json isDraft,isLatest,assets)"
+          published="$(gh release view "$tag" --repo "$REPOSITORY" --json isDraft,publishedAt,assets)"
+          latest_tag="$(gh api "repos/$REPOSITORY/releases/latest" --jq '.tag_name')"
           [[ "$(jq -r '.isDraft' <<<"$published")" == "false" ]]
-          [[ "$(jq -r '.isLatest' <<<"$published")" == "true" ]]
+          [[ "$(jq -r '.publishedAt' <<<"$published")" != "null" ]]
+          [[ "$latest_tag" == "$tag" ]]
           [[ "$(jq -r --arg file "$INSTALLER" '.assets[] | select(.name == $file) | .digest' <<<"$published")" == "sha256:$INSTALLER_SHA256" ]]
 
           echo "Published $tag with verified binary-only assets."
