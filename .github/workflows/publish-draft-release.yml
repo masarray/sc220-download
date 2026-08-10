@@ -59,6 +59,13 @@ jobs:
             exit 1
           fi
 
+      - name: Install fail-closed Inno Setup inspector
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install --yes innoextract
+
       - name: Download and validate draft assets
         shell: bash
         run: |
@@ -131,12 +138,10 @@ jobs:
           [[ "$vc_hash" == "$(jq -r '.vc_runtime.sha256 | ascii_downcase' "$manifest")" ]]
           [[ "$vb_hash" == "$(jq -r '.vb_cable.sha256 | ascii_downcase' "$manifest")" ]]
 
-          if command -v 7z >/dev/null 2>&1; then
-            7z l -slt "$installer" > installer-contents.txt
-            if grep -Ei '\.(c|cc|cpp|cxx|h|hh|hpp|cmake|pdb|obj|lib|exp)([[:space:]]|$)|CMakeLists\.txt|\.gitmodules' installer-contents.txt; then
-              echo "Source or debug material was embedded in the installer." >&2
-              exit 1
-            fi
+          innoextract --list "$installer" > installer-contents.txt
+          if grep -Ei '\.(c|cc|cpp|cxx|h|hh|hpp|cmake|pdb|obj|lib|exp)([[:space:]]|$)|CMakeLists\.txt|\.gitmodules' installer-contents.txt; then
+            echo "Source or debug material was embedded in the installer." >&2
+            exit 1
           fi
 
           if strings -a "$installer" | grep -Ei \
