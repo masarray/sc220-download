@@ -16,7 +16,151 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  inspect_installer:
+    runs-on: windows-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      REPOSITORY: ${{ github.repository }}
+      VERSION: ${{ inputs.version }}
+      INNOUNP_URL: https://www.rathlev-home.de/tools/download/innounp-270.zip
+      INNOUNP_SHA256: d5514cac741f12ca94f642eacd30d514d820dce016e4d016325413df472c34ea
+    steps:
+      - name: Inspect exact installer payload with pinned Inno Setup unpacker
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          Set-StrictMode -Version 3.0
+
+          if ($env:VERSION -notmatch '^\d+\.\d+\.\d+$') {
+            throw "Invalid semantic version: $env:VERSION"
+          }
+
+          $tag = "v$env:VERSION"
+          $installerName = "SC220-Live-v$env:VERSION-Setup-win-x64.exe"
+          $releases = gh api "repos/$env:REPOSITORY/releases?per_page=100" | ConvertFrom-Json
+          if ($LASTEXITCODE -ne 0) { throw 'Unable to enumerate draft releases.' }
+          $release = @($releases | Where-Object { $_.tag_name -eq $tag -and $_.draft }) | Select-Object -First 1
+          if (-not $release) { throw "$tag must exist as a draft release." }
+          $asset = @($release.assets | Where-Object { $_.name -eq $installerName }) | Select-Object -First 1
+          if (-not $asset -or $asset.digest -notmatch '^sha256:[0-9a-f]{64}$') {
+            throw 'Draft installer or its GitHub digest is missing.'
+          }
+
+          $headers = @{
+            Authorization = "Bearer $env:GH_TOKEN"
+            Accept = 'application/octet-stream'
+            'X-GitHub-Api-Version' = '2022-11-28'
+          }
+          $installerPath = Join-Path $env:RUNNER_TEMP $installerName
+          Invoke-WebRequest -Uri $asset.url -Headers $headers -OutFile $installerPath
+          $installerHash = (Get-FileHash -LiteralPath $installerPath -Algorithm SHA256).Hash.ToLowerInvariant()
+          if ("sha256:$installerHash" -ne [string]$asset.digest) {
+            throw 'Downloaded installer does not match the GitHub asset digest.'
+          }
+
+          $toolZip = Join-Path $env:RUNNER_TEMP 'innounp-270.zip'
+          $toolDir = Join-Path $env:RUNNER_TEMP 'innounp-270'
+          Invoke-WebRequest -Uri $env:INNOUNP_URL -OutFile $toolZip
+          $toolHash = (Get-FileHash -LiteralPath $toolZip -Algorithm SHA256).Hash.ToLowerInvariant()
+          if ($toolHash -ne $env:INNOUNP_SHA256) {
+            throw "Pinned innounp package hash mismatch: $toolHash"
+          }
+          Expand-Archive -LiteralPath $toolZip -DestinationPath $toolDir
+          $innounp = Join-Path $toolDir 'innounp.exe'
+
+          $listing = @(& $innounp -s -b -o -h $installerPath)
+          if ($LASTEXITCODE -ne 0) { throw "innounp listing failed with exit code $LASTEXITCODE" }
+          $payload = @(
+            $listing |
+              ForEach-Object { $_.Trim() } |
+              Where-Object { $_ -match '^(\{tmp\}|\{app\}|install_script\.iss$)' }
+          )
+          $expected = @(
+            '{tmp}\SC220PrerequisiteProbe.ps1',
+            '{tmp}\sc220-prerequisites\VC_redist.x64.exe',
+            '{tmp}\sc220-vbcable\pin_in.ico',
+            '{tmp}\sc220-vbcable\pin_out.ico',
+            '{tmp}\sc220-vbcable\readme.txt',
+            '{tmp}\sc220-vbcable\vbaudio_cable64arm_win10.sys',
+            '{tmp}\sc220-vbcable\vbaudio_cable64_2003.cat',
+            '{tmp}\sc220-vbcable\vbaudio_cable64_2003.sys',
+            '{tmp}\sc220-vbcable\vbaudio_cable64_vista.cat',
+            '{tmp}\sc220-vbcable\vbaudio_cable64_vista.sys',
+            '{tmp}\sc220-vbcable\vbaudio_cable64_win10.cat',
+            '{tmp}\sc220-vbcable\vbaudio_cable64_win10.sys',
+            '{tmp}\sc220-vbcable\vbaudio_cable64_win7.cat',
+            '{tmp}\sc220-vbcable\vbaudio_cable64_win7.sys',
+            '{tmp}\sc220-vbcable\vbaudio_cable_2003.cat',
+            '{tmp}\sc220-vbcable\vbaudio_cable_2003.sys',
+            '{tmp}\sc220-vbcable\vbaudio_cable_vista.cat',
+            '{tmp}\sc220-vbcable\vbaudio_cable_vista.sys',
+            '{tmp}\sc220-vbcable\vbaudio_cable_win7.cat',
+            '{tmp}\sc220-vbcable\vbaudio_cable_win7.sys',
+            '{tmp}\sc220-vbcable\vbaudio_cable_xp.cat',
+            '{tmp}\sc220-vbcable\vbaudio_cable_xp.sys',
+            '{tmp}\sc220-vbcable\VBCABLE_ControlPanel.exe',
+            '{tmp}\sc220-vbcable\VBCABLE_Setup.exe',
+            '{tmp}\sc220-vbcable\VBCABLE_Setup_x64.exe',
+            '{tmp}\sc220-vbcable\vbMmeCable64_2003.inf',
+            '{tmp}\sc220-vbcable\vbMmeCable64_vista.inf',
+            '{tmp}\sc220-vbcable\vbMmeCable64_win10.inf',
+            '{tmp}\sc220-vbcable\vbMmeCable64_win7.inf',
+            '{tmp}\sc220-vbcable\vbMmeCable_2003.inf',
+            '{tmp}\sc220-vbcable\vbMmeCable_vista.inf',
+            '{tmp}\sc220-vbcable\vbMmeCable_win7.inf',
+            '{tmp}\sc220-vbcable\vbMmeCable_xp.inf',
+            '{app}\SC220 Live.exe',
+            '{app}\Legal\EULA.txt',
+            '{app}\Legal\PURCHASE_TERMS.txt',
+            '{app}\Legal\THIRD_PARTY_NOTICES.md',
+            '{app}\Legal\VB_AUDIO_NOTICE.txt',
+            'install_script.iss'
+          )
+          $difference = @(Compare-Object -ReferenceObject $expected -DifferenceObject $payload)
+          if ($difference.Count -gt 0) {
+            $difference | Format-Table -AutoSize | Out-String | Write-Error
+            throw 'Installer payload differs from the exact public binary allowlist.'
+          }
+
+          $extractDir = Join-Path $env:RUNNER_TEMP 'sc220-installer-payload'
+          & $innounp -x -b -q -o -h "-d$extractDir" $installerPath
+          if ($LASTEXITCODE -ne 0) { throw "innounp extraction failed with exit code $LASTEXITCODE" }
+
+          $forbiddenFiles = @(
+            Get-ChildItem -LiteralPath $extractDir -Recurse -File -Force |
+              Where-Object {
+                $_.Extension -in @('.c','.cc','.cpp','.cxx','.h','.hh','.hpp','.cmake','.pdb','.obj','.lib','.exp','.pfx','.p12','.pem','.key') -or
+                $_.Name -in @('CMakeLists.txt','.gitmodules')
+              }
+          )
+          if ($forbiddenFiles.Count -gt 0) {
+            throw "Source, debug, or key files are embedded: $($forbiddenFiles.FullName -join ', ')"
+          }
+
+          $markers = @(
+            'third_party/askp-vst',
+            'third_party\askp-vst',
+            'PluginProcessor.cpp',
+            'PluginProcessor.h',
+            'PluginEditor.cpp',
+            'PluginEditor.h',
+            'BEGIN PRIVATE KEY',
+            'ArSonKuPik-license-private-key'
+          )
+          foreach ($file in Get-ChildItem -LiteralPath $extractDir -Recurse -File -Force) {
+            $bytes = [IO.File]::ReadAllBytes($file.FullName)
+            $text = [Text.Encoding]::GetEncoding(28591).GetString($bytes)
+            foreach ($marker in $markers) {
+              if ($text.IndexOf($marker, [StringComparison]::OrdinalIgnoreCase) -ge 0) {
+                throw "Private ASK-P source marker found in embedded file $($file.FullName): $marker"
+              }
+            }
+          }
+
+          Write-Host 'Exact installer payload and embedded binary scan passed.'
+
   publish:
+    needs: inspect_installer
     runs-on: ubuntu-latest
     env:
       GH_TOKEN: ${{ github.token }}
@@ -58,13 +202,6 @@ jobs:
             echo "Private ASK-P source or key material was found in the public repository." >&2
             exit 1
           fi
-
-      - name: Install fail-closed Inno Setup inspector
-        shell: bash
-        run: |
-          set -euo pipefail
-          sudo apt-get update
-          sudo apt-get install --yes innoextract
 
       - name: Download and validate draft assets
         shell: bash
@@ -137,12 +274,6 @@ jobs:
           [[ "$build_commit" == "$(jq -r '.source_commit | ascii_downcase' "$manifest")" ]]
           [[ "$vc_hash" == "$(jq -r '.vc_runtime.sha256 | ascii_downcase' "$manifest")" ]]
           [[ "$vb_hash" == "$(jq -r '.vb_cable.sha256 | ascii_downcase' "$manifest")" ]]
-
-          innoextract --list "$installer" > installer-contents.txt
-          if grep -Ei '\.(c|cc|cpp|cxx|h|hh|hpp|cmake|pdb|obj|lib|exp)([[:space:]]|$)|CMakeLists\.txt|\.gitmodules' installer-contents.txt; then
-            echo "Source or debug material was embedded in the installer." >&2
-            exit 1
-          fi
 
           if strings -a "$installer" | grep -Ei \
             'third_party[/\\]askp-vst|PluginProcessor\.(cpp|h)|PluginEditor\.(cpp|h)|BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY'; then
