@@ -21,22 +21,44 @@
 
 ## What is SC220 Live?
 
-SC220 Live is a native Windows audio application designed to bring a practical live-streaming signal path into one clear workspace. It combines audio from **Recording Tech SC220** and Windows playback, applies the **ASK-P Signature** processing chain, provides metering and level control, and sends the final mix to streaming software through a compatible virtual audio route.
+SC220 Live is a native Windows audio application that brings a practical live-streaming signal path into one clear workspace. It combines audio from **Recording Tech SC220** and Windows playback, applies **ASK-P Signature** processing, provides metering and level control, and sends the finished programme to streaming software through a compatible Windows audio route.
 
-It is intended for creators, karaoke users, educators, musicians, and live hosts who need a simpler way to prepare clean audio for **OBS Studio** or **TikTok Live Studio**.
+It is intended for creators, karaoke users, educators, musicians, reviewers, and live hosts who want a simpler way to prepare clean audio for **OBS Studio** or **TikTok Live Studio**.
 
 > [!IMPORTANT]
-> This repository is the official public distribution and documentation surface. The application source code, signing material, private build infrastructure, and credentials are maintained separately and are not published here.
+> This repository is the official public distribution and documentation surface. Application source code, proprietary DSP source, signing material, private build infrastructure, and credentials are maintained separately and are not published here.
+
+## Current stable release
+
+**SC220 Live v0.1.1** — published **August 10, 2026** for Windows 10/11 x64.
+
+| Item | Current release |
+|---|---|
+| Official download page | [sc220.pages.dev/en/download](https://sc220.pages.dev/en/download/) |
+| Windows installer | [SC220-Live-v0.1.1-Setup-win-x64.exe](https://github.com/masarray/sc220-download/releases/download/v0.1.1/SC220-Live-v0.1.1-Setup-win-x64.exe) |
+| Installer size | 24,043,506 bytes (about 22.9 MiB) |
+| Release notes | [RELEASE_NOTES_v0.1.1.md](RELEASE_NOTES_v0.1.1.md) |
+| Machine-readable metadata | [latest.json](latest.json) |
+| GitHub Release | [v0.1.1](https://github.com/masarray/sc220-download/releases/tag/v0.1.1) |
+
+### What changed in v0.1.1
+
+- Processing engine synchronized to the approved **ASK-P v0.5.24** production authority.
+- Reference Bypass uses a latency-aligned shared input path with smooth transitions.
+- Smart installer checks Microsoft Visual C++ Runtime, Windows Audio readiness, and VB-CABLE readiness before launch.
+- Stereo analyzer preserves anti-phase content by evaluating left/right channel energy independently.
+- Release packaging and verification contracts were hardened for more reliable public distribution.
+- SC220 Live still exposes the same five creative macros; **Gain Match remains disabled by default and is not exposed in the public UI**.
 
 ## Core capabilities
 
 - Mix Recording Tech SC220 input and Windows/PC audio independently.
 - Shape the final sound with ASK-P Signature processing.
-- Monitor input, output, peak, and stereo activity before going live.
+- Monitor input, output, peak, loudness, and stereo activity before going live.
 - Apply automatic ducking so PC audio lowers while the host speaks.
 - Route the finished mix to OBS Studio or TikTok Live Studio.
 - Keep core audio controls available after the 365-day full-control period.
-- Download versioned Windows installers with SHA-256 verification files.
+- Download versioned Windows installers with SHA-256 verification and manifest files.
 
 ## Signal flow
 
@@ -53,46 +75,35 @@ flowchart LR
 
 SC220 Live is **not** control software for Recording Tech KTV Pro K500. For a clear explanation of how a karaoke processor, audio interface, and Windows mixer differ, see the [KTV Pro K500 karaoke processor guide](https://sc220.pages.dev/en/ktv-k500-karaoke-processor/).
 
-## Download
-
-The current stable release is **SC220 Live v0.1.0** for Windows 10/11 x64.
-
-| Item | Official link |
-|---|---|
-| Official download page | [sc220.pages.dev/en/download](https://sc220.pages.dev/en/download/) |
-| Windows installer | [Download latest release](https://github.com/masarray/sc220-download/releases/latest) |
-| Release notes | [RELEASE_NOTES_v0.1.0.md](RELEASE_NOTES_v0.1.0.md) |
-| Machine-readable metadata | [latest.json](latest.json) |
-| Product website | [sc220.pages.dev](https://sc220.pages.dev/) |
-
-### Verify the installer
+## Verify the installer
 
 Current installer SHA-256:
 
 ```text
-c8a441f07605f48805233fbddf466312c1de733c647c95705317ad13ee2b7b04
+589b174357cb36c62611d7a0e89bfa6a7d25251fc27015b5dd5b25fb54c04686
 ```
 
 On Windows PowerShell:
 
 ```powershell
-Get-FileHash .\SC220-Live-v0.1.0-Setup-win-x64.exe -Algorithm SHA256
+Get-FileHash .\SC220-Live-v0.1.1-Setup-win-x64.exe -Algorithm SHA256
 ```
 
-The result must match the published checksum exactly. Release assets also include a checksum file and a supply-chain manifest.
+The result must match the published checksum exactly. Release assets also include a `.sha256` file and a supply-chain manifest.
 
 > [!NOTE]
-> Windows SmartScreen may show an unknown-publisher warning until a dedicated application code-signing certificate is deployed. Always download from this repository or the official website and verify the SHA-256 value.
+> Windows SmartScreen may show an unknown-publisher warning until a dedicated application code-signing certificate is deployed. Always download from this repository or the official website and verify SHA-256 if you are unsure.
 
 ## Quick start
 
-1. Open the [official SC220 Live download page](https://sc220.pages.dev/en/download/) and download the installer from GitHub Releases.
-2. Verify the SHA-256 checksum before installation.
-3. Install or configure a compatible virtual audio cable when your streaming workflow requires one.
-4. In SC220 Live, select the real SC220 input device and the desired Windows playback source.
-5. Set conservative levels, confirm the meters are active, and listen for clipping or excessive processing.
-6. Select the SC220 Live virtual output in OBS Studio or TikTok Live Studio.
-7. Test the entire path before enabling the live broadcast.
+1. Open the [official SC220 Live download page](https://sc220.pages.dev/en/download/) and download the installer.
+2. Verify the SHA-256 checksum when integrity verification is required.
+3. Run the installer as Administrator and follow its prerequisite checks.
+4. Install Standard VB-Audio VB-CABLE only when your streaming route requires it.
+5. In SC220 Live, select the correct SC220 input and Windows playback source.
+6. Select `CABLE Input` as Stream Output when using standard VB-CABLE.
+7. In OBS or TikTok Live Studio, select `CABLE Output` as the audio input.
+8. Make a test recording and confirm levels before going live.
 
 ## System requirements
 
@@ -100,24 +111,24 @@ The result must match the published checksum exactly. Release assets also includ
 - Recording Tech SC220 or another compatible Windows audio input device.
 - A working Windows playback device for PC audio.
 - OBS Studio, TikTok Live Studio, or another application that accepts Windows audio devices.
-- Optional VB-Audio VB-CABLE or an equivalent virtual audio route.
+- Optional Standard VB-Audio VB-CABLE or an equivalent compatible virtual audio route.
 
 ## Repository scope
 
 This public repository contains:
 
-- The production landing page and English/Indonesian SEO pages.
+- Production landing pages and English/Indonesian documentation.
 - Official release metadata and user-facing release notes.
-- Versioned installer assets, checksums, and manifests.
+- Versioned installer assets, checksums, and manifests through GitHub Releases.
 - Public support, security, and contribution documentation.
-- Cloudflare Pages deployment automation plus the GitHub Pages mirror.
+- Cloudflare Pages deployment automation plus a GitHub Pages mirror.
 
 It does **not** contain:
 
 - Application source code or debug symbols.
+- Proprietary DSP implementation source.
 - API credentials, signing keys, certificates, or secrets.
-- Private CI/CD infrastructure.
-- Proprietary DSP implementation details.
+- Private CI/CD and release infrastructure.
 
 ## Support and security
 
@@ -128,7 +139,7 @@ It does **not** contain:
 
 ## Release integrity
 
-Every public release should be traceable through:
+Every public release is expected to be traceable through:
 
 1. A versioned GitHub Release.
 2. A Windows installer with a stable filename.
@@ -146,6 +157,6 @@ SC220 Live is maintained by MasArray / Recording Tech. Windows, OBS Studio, TikT
 ---
 
 <div align="center">
-  <strong>SC220 Live</strong><br>
+  <strong>SC220 Live v0.1.1</strong><br>
   Clean routing. Clear controls. Ready for broadcast.
 </div>

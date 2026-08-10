@@ -20,22 +20,44 @@
 
 ## Apa itu SC220 Live?
 
-SC220 Live adalah aplikasi audio native Windows yang menyatukan jalur live streaming ke dalam satu workspace yang jelas. Aplikasi ini menggabungkan audio dari **Recording Tech SC220** dan playback Windows, memprosesnya melalui **ASK-P Signature**, menyediakan meter serta kontrol level, lalu mengirim hasil mix menuju aplikasi streaming melalui jalur audio virtual yang kompatibel.
+SC220 Live adalah aplikasi audio native Windows yang menyatukan jalur live streaming ke dalam satu workspace yang jelas. Aplikasi ini menggabungkan audio dari **Recording Tech SC220** dan playback Windows, memprosesnya melalui **ASK-P Signature**, menyediakan meter serta kontrol level, lalu mengirim hasil mix menuju aplikasi streaming melalui jalur audio Windows yang kompatibel.
 
-SC220 Live ditujukan untuk kreator, pengguna karaoke, pengajar, musisi, dan host live yang membutuhkan cara lebih mudah untuk menyiapkan audio bersih menuju **OBS Studio** atau **TikTok Live Studio**.
+SC220 Live ditujukan untuk kreator, pengguna karaoke, pengajar, musisi, reviewer, dan host live yang membutuhkan cara lebih mudah untuk menyiapkan audio bersih menuju **OBS Studio** atau **TikTok Live Studio**.
 
 > [!IMPORTANT]
-> Repository ini adalah pusat distribusi dan dokumentasi publik resmi. Source code aplikasi, material signing, infrastruktur build privat, dan credential tidak dipublikasikan di sini.
+> Repository ini adalah pusat distribusi dan dokumentasi publik resmi. Source code aplikasi, source DSP proprietary, material signing, infrastruktur build privat, dan credential tidak dipublikasikan di sini.
+
+## Rilis stabil saat ini
+
+**SC220 Live v0.1.1** — diterbitkan **10 Agustus 2026** untuk Windows 10/11 x64.
+
+| Item | Rilis saat ini |
+|---|---|
+| Halaman download resmi | [sc220.pages.dev/download](https://sc220.pages.dev/download/) |
+| Installer Windows | [SC220-Live-v0.1.1-Setup-win-x64.exe](https://github.com/masarray/sc220-download/releases/download/v0.1.1/SC220-Live-v0.1.1-Setup-win-x64.exe) |
+| Ukuran installer | 24.043.506 byte (sekitar 22,9 MiB) |
+| Catatan rilis | [RELEASE_NOTES_v0.1.1.md](RELEASE_NOTES_v0.1.1.md) |
+| Metadata machine-readable | [latest.json](latest.json) |
+| GitHub Release | [v0.1.1](https://github.com/masarray/sc220-download/releases/tag/v0.1.1) |
+
+### Yang baru di v0.1.1
+
+- Engine pemrosesan disinkronkan ke authority produksi **ASK-P v0.5.24** yang disetujui.
+- Reference Bypass memakai jalur input bersama yang selaras latensi dengan transisi halus.
+- Smart installer memeriksa Microsoft Visual C++ Runtime, kesiapan Windows Audio, dan kesiapan VB-CABLE sebelum aplikasi dijalankan.
+- Analyzer stereo tetap membaca konten anti-phase dengan mengevaluasi energi kanal kiri dan kanan secara terpisah.
+- Kontrak packaging dan verifikasi release diperkuat agar distribusi publik lebih reliable.
+- SC220 Live tetap memakai lima macro kreatif yang sama; **Gain Match tetap OFF secara default dan tidak ditampilkan di UI publik**.
 
 ## Kemampuan utama
 
 - Menggabungkan input Recording Tech SC220 dan audio Windows/PC secara independen.
 - Membentuk karakter suara melalui pemrosesan ASK-P Signature.
-- Memantau input, output, peak, dan aktivitas stereo sebelum live.
+- Memantau input, output, peak, loudness, dan aktivitas stereo sebelum live.
 - Menurunkan audio PC secara otomatis ketika host berbicara melalui fungsi ducking.
 - Mengirim hasil akhir menuju OBS Studio atau TikTok Live Studio.
 - Menjaga kontrol audio inti tetap aktif setelah masa full control 365 hari.
-- Menyediakan installer Windows dengan file verifikasi SHA-256.
+- Menyediakan installer Windows versioned dengan SHA-256 dan manifest verifikasi.
 
 ## Alur sinyal
 
@@ -52,46 +74,35 @@ flowchart LR
 
 SC220 Live **bukan** software kontrol Recording Tech KTV Pro K500. Penjelasan perbedaan karaoke processor, audio interface, dan mixer Windows tersedia pada [panduan KTV Pro K500](https://sc220.pages.dev/ktv-k500-karaoke-processor/).
 
-## Unduh
-
-Rilis stabil saat ini adalah **SC220 Live v0.1.0** untuk Windows 10/11 x64.
-
-| Item | Tautan resmi |
-|---|---|
-| Halaman download resmi | [sc220.pages.dev/download](https://sc220.pages.dev/download/) |
-| Installer Windows | [Unduh rilis terbaru](https://github.com/masarray/sc220-download/releases/latest) |
-| Catatan rilis | [RELEASE_NOTES_v0.1.0.md](RELEASE_NOTES_v0.1.0.md) |
-| Metadata machine-readable | [latest.json](latest.json) |
-| Website produk | [sc220.pages.dev](https://sc220.pages.dev/) |
-
-### Verifikasi installer
+## Verifikasi installer
 
 SHA-256 installer saat ini:
 
 ```text
-c8a441f07605f48805233fbddf466312c1de733c647c95705317ad13ee2b7b04
+589b174357cb36c62611d7a0e89bfa6a7d25251fc27015b5dd5b25fb54c04686
 ```
 
-Jalankan melalui Windows PowerShell:
+Jalankan di Windows PowerShell:
 
 ```powershell
-Get-FileHash .\SC220-Live-v0.1.0-Setup-win-x64.exe -Algorithm SHA256
+Get-FileHash .\SC220-Live-v0.1.1-Setup-win-x64.exe -Algorithm SHA256
 ```
 
-Hasilnya harus sama persis dengan checksum yang dipublikasikan. Aset rilis juga menyertakan file checksum dan supply-chain manifest.
+Hasilnya harus sama persis dengan checksum yang dipublikasikan. Release juga menyediakan file `.sha256` dan manifest supply-chain.
 
 > [!NOTE]
-> Windows SmartScreen mungkin menampilkan peringatan unknown publisher sampai sertifikat code-signing khusus tersedia. Selalu unduh dari repository atau website resmi dan periksa SHA-256.
+> Windows SmartScreen dapat menampilkan peringatan unknown publisher sampai sertifikat code-signing khusus aplikasi tersedia. Selalu unduh dari repository atau website resmi dan periksa SHA-256 bila ragu.
 
 ## Cara mulai
 
-1. Buka [halaman download resmi SC220 Live](https://sc220.pages.dev/download/) dan unduh installer dari GitHub Release.
-2. Verifikasi checksum SHA-256 sebelum instalasi.
-3. Instal atau atur virtual audio cable yang kompatibel bila diperlukan oleh alur streaming.
-4. Pilih perangkat input SC220 yang benar dan sumber playback Windows di SC220 Live.
-5. Atur level secara konservatif, pastikan meter bergerak, dan periksa clipping atau pemrosesan berlebihan.
-6. Pilih output virtual SC220 Live di OBS Studio atau TikTok Live Studio.
-7. Uji seluruh jalur sebelum mengaktifkan siaran live.
+1. Buka [halaman download resmi SC220 Live](https://sc220.pages.dev/download/) dan unduh installer.
+2. Verifikasi SHA-256 bila pemeriksaan integritas diperlukan.
+3. Jalankan installer sebagai Administrator dan ikuti pemeriksaan prasyaratnya.
+4. Pasang Standard VB-Audio VB-CABLE hanya bila jalur streaming Anda membutuhkannya.
+5. Di SC220 Live, pilih input SC220 dan sumber playback Windows yang benar.
+6. Pilih `CABLE Input` sebagai Stream Output bila menggunakan standard VB-CABLE.
+7. Di OBS atau TikTok Live Studio pilih `CABLE Output` sebagai input audio.
+8. Buat rekaman tes dan periksa level sebelum GO LIVE.
 
 ## Persyaratan sistem
 
@@ -99,24 +110,24 @@ Hasilnya harus sama persis dengan checksum yang dipublikasikan. Aset rilis juga 
 - Recording Tech SC220 atau perangkat input audio Windows yang kompatibel.
 - Perangkat playback Windows aktif untuk audio PC.
 - OBS Studio, TikTok Live Studio, atau aplikasi lain yang menerima perangkat audio Windows.
-- Opsional VB-Audio VB-CABLE atau jalur audio virtual setara.
+- Opsional Standard VB-Audio VB-CABLE atau jalur audio virtual kompatibel lainnya.
 
 ## Isi repository
 
 Repository publik ini memuat:
 
-- Landing page produksi dan halaman SEO Indonesia/Inggris.
+- Landing page produksi dan dokumentasi Indonesia/Inggris.
 - Metadata rilis resmi dan catatan rilis pengguna.
-- Installer versioned, checksum, dan manifest.
+- Installer versioned, checksum, dan manifest melalui GitHub Releases.
 - Dokumentasi support, security, dan kontribusi publik.
 - Otomasi deployment Cloudflare Pages dan GitHub Pages mirror.
 
 Repository ini tidak memuat:
 
-- Source code aplikasi atau debug symbols.
+- Source code aplikasi atau debug symbol.
+- Source implementasi DSP proprietary.
 - API credential, signing key, sertifikat, atau secret.
-- Infrastruktur CI/CD privat.
-- Detail implementasi DSP proprietary.
+- Infrastruktur CI/CD dan release privat.
 
 ## Dukungan dan keamanan
 
@@ -127,7 +138,7 @@ Repository ini tidak memuat:
 
 ## Integritas rilis
 
-Setiap rilis publik seharusnya dapat ditelusuri melalui:
+Setiap rilis publik diharapkan dapat ditelusuri melalui:
 
 1. GitHub Release dengan versi jelas.
 2. Installer Windows dengan nama file stabil.
@@ -145,6 +156,6 @@ SC220 Live dikelola oleh MasArray / Recording Tech. Windows, OBS Studio, TikTok,
 ---
 
 <div align="center">
-  <strong>SC220 Live</strong><br>
+  <strong>SC220 Live v0.1.1</strong><br>
   Routing bersih. Kontrol jelas. Siap siaran.
 </div>

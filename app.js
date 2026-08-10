@@ -2,10 +2,10 @@
   "use strict";
 
   const fallback = {
-    version: "0.1.0",
-    published: "2026-08-06",
-    download: "https://github.com/masarray/sc220-download/releases",
-    sha256: "c8a441f07605f48805233fbddf466312c1de733c647c95705317ad13ee2b7b04"
+    version: "0.1.1",
+    published: "2026-08-10",
+    download: "https://github.com/masarray/sc220-download/releases/download/v0.1.1/SC220-Live-v0.1.1-Setup-win-x64.exe",
+    sha256: "589b174357cb36c62611d7a0e89bfa6a7d25251fc27015b5dd5b25fb54c04686"
   };
 
   const html = document.documentElement;
@@ -34,7 +34,8 @@
   const setReleaseData = (release) => {
     const version = String(release.version || fallback.version).replace(/^v/i, "");
     const versionLabel = `v${version}`;
-    const published = formatDate(release.published || fallback.published);
+    const publishedIso = release.published || fallback.published;
+    const published = formatDate(publishedIso);
     const download = release.download || fallback.download;
     const sha256 = release.sha256 || fallback.sha256;
     const releaseUrl = `https://github.com/masarray/sc220-download/releases/tag/${encodeURIComponent(versionLabel)}`;
@@ -53,6 +54,26 @@
     });
     document.querySelectorAll("[data-sha]").forEach((node) => {
       node.textContent = sha256;
+    });
+
+    // Keep rendered SoftwareApplication structured data synchronized with latest.json.
+    // Static HTML remains readable without JavaScript; this updates dynamic release fields
+    // whenever a newer verified release is published.
+    document.querySelectorAll('script[type="application/ld+json"]').forEach((node) => {
+      try {
+        const data = JSON.parse(node.textContent || "{}");
+        const graph = Array.isArray(data?.["@graph"]) ? data["@graph"] : [data];
+        graph.forEach((entry) => {
+          if (entry?.["@type"] === "SoftwareApplication") {
+            entry.softwareVersion = version;
+            entry.datePublished = publishedIso;
+            entry.downloadUrl = download;
+          }
+        });
+        node.textContent = JSON.stringify(data);
+      } catch {
+        // Preserve static metadata if a page contains non-JSON structured data.
+      }
     });
   };
 
@@ -160,7 +181,7 @@
       const supportLink = document.createElement("a");
       supportLink.href = "support/";
       supportLink.dataset.p1Support = "";
-      supportLink.textContent = isEnGuide ? "Driver & support" : "Driver & support";
+      supportLink.textContent = "Driver & support";
       guideNav.append(setupLink, supportLink);
     }
 
