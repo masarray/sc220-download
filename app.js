@@ -2,10 +2,10 @@
   "use strict";
 
   const fallback = {
-    version: "0.1.1",
-    published: "2026-08-10",
-    download: "https://github.com/masarray/sc220-download/releases/download/v0.1.1/SC220-Live-v0.1.1-Setup-win-x64.exe",
-    sha256: "589b174357cb36c62611d7a0e89bfa6a7d25251fc27015b5dd5b25fb54c04686"
+    version: "0.1.2",
+    published: "2026-08-14",
+    download: "https://github.com/masarray/sc220-download/releases/download/v0.1.2/SC220-Live-v0.1.2-Setup-win-x64.exe",
+    sha256: "ba6c61617d8c796dd953234e50f6d2e179c5efbe5e281892da7e7ba977e55693"
   };
 
   const html = document.documentElement;
