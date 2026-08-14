@@ -1,0 +1,38 @@
+name: Deploy after release landing sync
+
+on:
+  workflow_run:
+    workflows:
+      - Sync release metadata to landing pages
+    types:
+      - completed
+  workflow_dispatch:
+
+permissions:
+  actions: write
+  contents: read
+
+jobs:
+  deploy:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dispatch GitHub Pages deployment
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh workflow run deploy-pages.yml \
+            --repo "$GITHUB_REPOSITORY" \
+            --ref main
+
+      - name: Dispatch Cloudflare Pages deployment
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh workflow run deploy-cloudflare.yml \
+            --repo "$GITHUB_REPOSITORY" \
+            --ref main
