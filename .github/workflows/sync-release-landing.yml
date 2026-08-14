@@ -28,6 +28,12 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Stage verified release behind production gate
+        if: github.event_name == 'workflow_run'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash scripts/manage-production-release.sh stage
+
       - name: Synchronize latest.json to every public release surface
         run: python3 scripts/sync-release-metadata.py
 
@@ -83,6 +89,7 @@ jobs:
           fi
 
           bash -n scripts/verify-production-release.sh
+          bash -n scripts/manage-production-release.sh
           git diff --check
           bash scripts/build-static-site.sh cloudflare
 

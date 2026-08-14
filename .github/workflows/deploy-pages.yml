@@ -1,7 +1,19 @@
 name: Deploy SC220 Live to GitHub Pages
 
 on:
+  workflow_call:
+    inputs:
+      source_ref:
+        description: Exact commit/ref to deploy
+        required: true
+        type: string
   workflow_dispatch:
+    inputs:
+      source_ref:
+        description: Exact commit/ref to deploy
+        required: false
+        default: main
+        type: string
 
 permissions:
   contents: read
@@ -21,6 +33,8 @@ jobs:
     steps:
       - name: Checkout public distribution repository
         uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.source_ref }}
 
       - name: Build static site mirror
         run: bash scripts/build-static-site.sh github

@@ -1,4 +1,4 @@
-name: Deploy after release landing sync
+name: Production gate after release sync
 
 on:
   workflow_run:
@@ -7,36 +7,116 @@ on:
     types:
       - completed
   workflow_dispatch:
+    inputs:
+      source_ref:
+        description: Exact commit/ref to deploy
+        required: false
+        default: main
+        type: string
+      release_gate:
+        description: Promote/rollback the release referenced by latest.json
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   actions: write
-  contents: read
+  contents: write
+  deployments: write
+  pages: write
+  id-token: write
 
 concurrency:
-  group: sc220-deploy-after-sync
-  cancel-in-progress: true
+  group: sc220-production-gate
+  cancel-in-progress: false
 
 jobs:
-  deploy:
+  prepare:
     if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
+    outputs:
+      source_ref: ${{ steps.source.outputs.source_ref }}
+      release_gate: ${{ steps.source.outputs.release_gate }}
     steps:
-      - name: Dispatch GitHub Pages deployment
+      - name: Resolve exact synchronized source
+        id: source
         env:
           GH_TOKEN: ${{ github.token }}
+          REQUESTED_REF: ${{ inputs.source_ref }}
+          REQUESTED_GATE: ${{ inputs.release_gate }}
+          UPSTREAM_EVENT: ${{ github.event.workflow_run.event }}
         shell: bash
         run: |
           set -euo pipefail
-          gh workflow run deploy-pages.yml \
-            --repo "$GITHUB_REPOSITORY" \
-            --ref main
 
-      - name: Dispatch Cloudflare Pages deployment
+          if [[ "$GITHUB_EVENT_NAME" == "workflow_dispatch" ]]; then
+            ref="${REQUESTED_REF:-main}"
+            gate="${REQUESTED_GATE:-false}"
+          else
+            ref="$(gh api "repos/$GITHUB_REPOSITORY/branches/main" --jq '.commit.sha')"
+            if [[ "$UPSTREAM_EVENT" == "workflow_run" ]]; then
+              gate="true"
+            else
+              gate="false"
+            fi
+          fi
+
+          echo "source_ref=$ref" >> "$GITHUB_OUTPUT"
+          echo "release_gate=$gate" >> "$GITHUB_OUTPUT"
+          echo "Production gate source: $ref; release promotion/rollback: $gate"
+
+  deploy_pages:
+    needs: prepare
+    uses: ./.github/workflows/deploy-pages.yml
+    with:
+      source_ref: ${{ needs.prepare.outputs.source_ref }}
+
+  deploy_cloudflare:
+    needs: prepare
+    uses: ./.github/workflows/deploy-cloudflare.yml
+    with:
+      source_ref: ${{ needs.prepare.outputs.source_ref }}
+    secrets: inherit
+
+  finalize:
+    if: always() && needs.prepare.result == 'success'
+    needs:
+      - prepare
+      - deploy_pages
+      - deploy_cloudflare
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout gated source
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.prepare.outputs.source_ref }}
+          fetch-depth: 0
+
+      - name: Promote verified release or rollback failed candidate
         env:
           GH_TOKEN: ${{ github.token }}
+          RELEASE_GATE: ${{ needs.prepare.outputs.release_gate }}
+          PAGES_RESULT: ${{ needs.deploy_pages.result }}
+          CLOUDFLARE_RESULT: ${{ needs.deploy_cloudflare.result }}
         shell: bash
         run: |
           set -euo pipefail
-          gh workflow run deploy-cloudflare.yml \
-            --repo "$GITHUB_REPOSITORY" \
-            --ref main
+
+          if [[ "$PAGES_RESULT" == "success" && "$CLOUDFLARE_RESULT" == "success" ]]; then
+            if [[ "$RELEASE_GATE" == "true" ]]; then
+              if ! bash scripts/manage-production-release.sh promote; then
+                echo "Release promotion failed after deployment; rolling production metadata back." >&2
+                bash scripts/manage-production-release.sh rollback
+                exit 1
+              fi
+            fi
+
+            echo "Production gate passed: GitHub Pages and Cloudflare are healthy."
+            exit 0
+          fi
+
+          echo "Production gate failed: GitHub Pages=$PAGES_RESULT, Cloudflare=$CLOUDFLARE_RESULT." >&2
+          if [[ "$RELEASE_GATE" == "true" ]]; then
+            bash scripts/manage-production-release.sh rollback
+          fi
+          exit 1
