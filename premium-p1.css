@@ -1,0 +1,461 @@
+/* SC220 Live P1 — immersive product chapters, tighter visual system, stronger responsive crops. */
+
+:root {
+  --shell: min(1320px, calc(100vw - 64px));
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+}
+
+/* Stronger readability without losing the restrained palette. */
+.hero-lead,
+.dark-section .section-heading > p,
+.feature-card p,
+.setup-copy > p,
+.setup-steps p,
+.download-copy > p,
+.guide-hero p,
+.guide-panel span,
+.site-footer { color: rgba(255,255,255,.64); }
+.section-heading > p,
+.topic-copy p,
+.persona-grid p,
+.licence-main p,
+.licence-after p,
+.article-section p,
+.article-section li { color: #575c56; }
+
+/* Metadata stays secondary, but is no longer microscopically small. */
+.kicker,
+.feature-tag,
+.signal-flow article small,
+.guide-eyebrow,
+.topic-card small { font-size: 10px; }
+.stage-topline,
+.live-status { font-size: 10px; }
+.stage-caption { font-size: 9px; }
+.hero-trust { font-size: 12px; }
+.hero-bottom,
+.release-row > span,
+.release-row strong { font-size: 12px; }
+
+/* Hero polish: a cleaner stage and a more intentional screenshot crop. */
+.hero-shell { align-items: center; }
+.product-stage {
+  width: 112%;
+  margin-right: -12%;
+  border-radius: 24px;
+}
+.product-shot img {
+  transform: scale(1.032);
+  transform-origin: 51% 49%;
+}
+.product-stage:hover .product-shot img { transform: scale(1.037); }
+.stage-caption {
+  min-height: 34px;
+  letter-spacing: .1em;
+}
+.hero-bottom { border-top-color: rgba(255,255,255,.075); }
+
+/* Section rhythm: fewer repetitive card stacks, more editorial breathing room. */
+.plain-section,
+.dark-section,
+.setup-section,
+.download-section { padding: clamp(104px, 8.5vw, 146px) 0; }
+.section-heading { margin-bottom: clamp(58px, 6vw, 78px); }
+.section-heading h2,
+.setup-copy h2,
+.download-copy h2,
+.requirements h2,
+.faq h2 { line-height: 1.06; }
+
+/* Feature area becomes a true product-story chapter system. */
+.features { overflow: hidden; }
+.features > * { position: relative; z-index: 2; }
+.features::before {
+  content: "";
+  position: absolute;
+  width: 760px;
+  height: 760px;
+  right: -360px;
+  top: 140px;
+  border: 1px solid rgba(255,255,255,.035);
+  border-radius: 50%;
+  pointer-events: none;
+}
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 16px;
+}
+.feature-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 20px;
+}
+.feature-wide {
+  grid-column: 1 / -1;
+  min-height: 510px;
+  padding: clamp(38px, 4vw, 58px);
+  grid-template-columns: minmax(280px, .68fr) minmax(0, 1.32fr);
+  gap: clamp(42px, 6vw, 84px);
+  border-radius: 26px;
+}
+.feature-wide .feature-copy {
+  position: relative;
+  z-index: 3;
+  align-self: center;
+}
+.feature-wide h3 {
+  max-width: 500px;
+  font-size: clamp(32px, 3.1vw, 44px);
+  line-height: 1.08;
+}
+.feature-wide p {
+  max-width: 470px;
+  font-size: 14px;
+  line-height: 1.78;
+}
+.feature-wide .mini-mixer {
+  height: 360px;
+  border-radius: 20px;
+  background-size: 144%;
+  background-position: 49% 46%;
+  box-shadow: 0 34px 92px rgba(0,0,0,.42);
+}
+.feature-wide .mini-mixer::before {
+  content: "REAL SC220 LIVE UI";
+  position: absolute;
+  z-index: 3;
+  left: 18px;
+  bottom: 16px;
+  padding: 7px 10px;
+  border: 1px solid rgba(255,255,255,.11);
+  border-radius: 8px;
+  color: rgba(255,255,255,.68);
+  background: rgba(8,10,9,.58);
+  backdrop-filter: blur(12px);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .11em;
+}
+
+/* Real UI detail crops replace generic empty feature-card surfaces. */
+.feature-grid > .feature-card:not(.feature-wide) {
+  grid-column: span 6;
+  min-height: 420px;
+  padding: 232px 34px 34px;
+  background: #121413;
+}
+.feature-grid > .feature-card:not(.feature-wide)::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 196px;
+  background-image:
+    linear-gradient(180deg, rgba(8,10,9,.02), rgba(8,10,9,.34)),
+    url("assets/screenshot/Screenshot.webp");
+  background-repeat: no-repeat;
+  border-bottom: 1px solid rgba(255,255,255,.075);
+  transform: scale(1.018);
+  transform-origin: center;
+}
+.feature-grid > .feature-card:not(.feature-wide)::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  box-shadow: inset 0 1px rgba(255,255,255,.045);
+}
+.feature-grid > .feature-card:not(.feature-wide) .feature-icon {
+  position: absolute;
+  z-index: 4;
+  top: 171px;
+  left: 34px;
+  width: 44px;
+  height: 44px;
+  border-color: rgba(255,255,255,.12);
+  background: #171a18;
+  box-shadow: 0 12px 28px rgba(0,0,0,.28);
+}
+.feature-grid > .feature-card:not(.feature-wide) h3,
+.feature-grid > .feature-card:not(.feature-wide) p {
+  position: relative;
+  z-index: 3;
+}
+.feature-grid > .feature-card:not(.feature-wide) h3 {
+  margin: 0 0 11px;
+  font-size: 21px;
+  letter-spacing: -.025em;
+}
+.feature-grid > .feature-card:not(.feature-wide) p {
+  max-width: 510px;
+  font-size: 13px;
+  line-height: 1.74;
+}
+
+/* Each feature points at a different part of the real interface. */
+.feature-grid > .feature-card:nth-child(2)::before {
+  background-size: 210%;
+  background-position: 70% 35%;
+}
+.feature-grid > .feature-card:nth-child(3)::before {
+  background-size: 225%;
+  background-position: 86% 53%;
+}
+.feature-grid > .feature-card:nth-child(4)::before {
+  background-size: 205%;
+  background-position: 49% 62%;
+}
+.feature-grid > .feature-card:nth-child(5)::before {
+  background-size: 215%;
+  background-position: 18% 72%;
+}
+.feature-grid > .feature-card:nth-child(6) {
+  grid-column: 1 / -1;
+  min-height: 360px;
+  padding: 70px 48px 58px calc(50% + 54px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background:
+    radial-gradient(circle at 75% 24%, rgba(232,117,45,.08), transparent 38%),
+    #121413;
+}
+.feature-grid > .feature-card:nth-child(6)::before {
+  inset: 0 auto 0 0;
+  width: 50%;
+  height: 100%;
+  border-right: 1px solid rgba(255,255,255,.075);
+  border-bottom: 0;
+  background-size: 165%;
+  background-position: 78% 74%;
+  transform: scale(1.02);
+}
+.feature-grid > .feature-card:nth-child(6) .feature-icon {
+  position: relative;
+  inset: auto;
+  margin-bottom: 24px;
+}
+.feature-grid > .feature-card:nth-child(6) h3 { font-size: 27px; }
+.feature-grid > .feature-card:nth-child(6) p { font-size: 14px; max-width: 470px; }
+
+/* How-it-works is deliberately flatter and more architectural. */
+.signal-flow article { padding-left: 26px; padding-right: 26px; }
+.signal-flow article h3 { font-size: 19px; }
+.signal-flow article p { font-size: 13px; line-height: 1.72; }
+.flow-highlight p { color: rgba(255,255,255,.64) !important; }
+
+/* Secondary content is calmer and less boxed-in. */
+.topic-card,
+.licence-card,
+.release-card,
+.guide-panel,
+.intent-box,
+.comparison-wrap { border-radius: 20px; }
+.topic-card {
+  border-color: #ddd8ce;
+  box-shadow: 0 28px 86px rgba(20,17,12,.07);
+}
+.persona-grid article { padding-top: 36px; padding-bottom: 40px; }
+.persona-grid h3 { font-size: 20px; }
+.persona-grid p { font-size: 13px; line-height: 1.75; }
+
+/* Setup gets stronger hierarchy and larger touch/read targets. */
+.setup-steps li {
+  grid-template-columns: 64px 1fr;
+  padding: 34px 0;
+}
+.setup-steps li > span { font-size: 11px; }
+.setup-steps h3 { font-size: 18px; }
+.setup-steps p { font-size: 13px; line-height: 1.75; }
+
+/* Download hero now includes a real product visual, not only metadata. */
+.guide-panel {
+  position: relative;
+  overflow: hidden;
+  padding: 220px 30px 28px;
+}
+.guide-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 186px;
+  background-image:
+    linear-gradient(180deg, rgba(8,10,9,.01), rgba(8,10,9,.28)),
+    url("assets/screenshot/Screenshot.webp");
+  background-repeat: no-repeat;
+  background-size: 164%;
+  background-position: 52% 47%;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+  transform: scale(1.018);
+}
+.guide-panel ol { position: relative; z-index: 2; }
+.guide-panel b { font-size: 14px; }
+.guide-panel span { font-size: 12px; line-height: 1.5; }
+.article-shell { width: min(940px, calc(100vw - 56px)); }
+.article-section p { line-height: 1.82; }
+.comparison th,
+.comparison td { padding: 20px 22px; }
+
+/* Refined final CTA and footer rhythm. */
+.download-shell { gap: clamp(56px, 8vw, 100px); }
+.download-copy h2 { max-width: 720px; }
+.release-card { padding: 34px; }
+.footer-top { min-height: 168px; }
+.footer-links { gap: 24px; }
+.footer-links a { font-size: 12px; }
+
+@media (max-width: 1180px) {
+  :root { --shell: min(100% - 48px, 1080px); }
+  .product-stage { width: 100%; margin-right: 0; }
+  .feature-wide { min-height: 470px; }
+  .feature-wide .mini-mixer { height: 330px; }
+}
+
+@media (max-width: 900px) {
+  :root { --shell: calc(100% - 36px); }
+  .product-shot img {
+    transform: scale(1.03);
+    transform-origin: 52% 49%;
+  }
+  .product-stage:hover .product-shot img { transform: scale(1.03); }
+  .feature-wide {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+  .feature-wide .mini-mixer {
+    height: 330px;
+    background-size: 150%;
+    background-position: 50% 46%;
+  }
+  .feature-grid > .feature-card:not(.feature-wide) {
+    grid-column: 1 / -1;
+    min-height: 390px;
+  }
+  .feature-grid > .feature-card:nth-child(6) {
+    min-height: 410px;
+    padding: 238px 34px 38px;
+    display: block;
+  }
+  .feature-grid > .feature-card:nth-child(6)::before {
+    inset: 0 0 auto;
+    width: 100%;
+    height: 205px;
+    border-right: 0;
+    border-bottom: 1px solid rgba(255,255,255,.075);
+    background-size: 172%;
+    background-position: 76% 72%;
+  }
+  .feature-grid > .feature-card:nth-child(6) .feature-icon {
+    position: absolute;
+    top: 181px;
+    left: 34px;
+    margin: 0;
+  }
+  .guide-panel { max-width: none; }
+}
+
+@media (max-width: 560px) {
+  :root { --shell: calc(100% - 28px); }
+  .hero h1 { letter-spacing: -.047em; }
+  .hero-trust { font-size: 11px; }
+  .product-stage {
+    width: 106%;
+    margin-left: -3%;
+    border-radius: 15px;
+  }
+  .product-shot img {
+    transform: scale(1.045);
+    transform-origin: 54% 48%;
+  }
+  .product-stage:hover .product-shot img { transform: scale(1.045); }
+  .stage-caption { font-size: 8px; }
+  .plain-section,
+  .dark-section,
+  .setup-section,
+  .download-section { padding: 88px 0; }
+  .section-heading { margin-bottom: 46px; }
+  .feature-grid { gap: 12px; }
+  .feature-wide {
+    padding: 27px;
+    border-radius: 18px;
+  }
+  .feature-wide h3 { font-size: 30px; }
+  .feature-wide p { font-size: 13px; }
+  .feature-wide .mini-mixer {
+    height: 225px;
+    border-radius: 14px;
+    background-size: 184%;
+    background-position: 52% 46%;
+  }
+  .feature-wide .mini-mixer::before {
+    left: 12px;
+    bottom: 11px;
+    padding: 6px 8px;
+    font-size: 8px;
+  }
+  .feature-grid > .feature-card:not(.feature-wide) {
+    min-height: 345px;
+    padding: 202px 24px 27px;
+    border-radius: 16px;
+  }
+  .feature-grid > .feature-card:not(.feature-wide)::before {
+    height: 170px;
+    transform: scale(1.03);
+  }
+  .feature-grid > .feature-card:not(.feature-wide) .feature-icon {
+    top: 147px;
+    left: 24px;
+    width: 42px;
+    height: 42px;
+  }
+  .feature-grid > .feature-card:not(.feature-wide) h3 { font-size: 20px; }
+  .feature-grid > .feature-card:nth-child(2)::before {
+    background-size: 260%;
+    background-position: 72% 35%;
+  }
+  .feature-grid > .feature-card:nth-child(3)::before {
+    background-size: 270%;
+    background-position: 87% 52%;
+  }
+  .feature-grid > .feature-card:nth-child(4)::before {
+    background-size: 245%;
+    background-position: 49% 62%;
+  }
+  .feature-grid > .feature-card:nth-child(5)::before {
+    background-size: 260%;
+    background-position: 19% 72%;
+  }
+  .feature-grid > .feature-card:nth-child(6) {
+    min-height: 350px;
+    padding: 202px 24px 28px;
+  }
+  .feature-grid > .feature-card:nth-child(6)::before {
+    height: 170px;
+    background-size: 220%;
+    background-position: 77% 72%;
+  }
+  .feature-grid > .feature-card:nth-child(6) .feature-icon {
+    top: 147px;
+    left: 24px;
+  }
+  .feature-grid > .feature-card:nth-child(6) h3 { font-size: 22px; }
+  .guide-panel {
+    padding: 188px 22px 22px;
+    border-radius: 16px;
+  }
+  .guide-panel::before {
+    height: 158px;
+    background-size: 205%;
+    background-position: 52% 47%;
+  }
+  .article-shell { width: calc(100% - 28px); }
+  .release-card { padding: 24px 20px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .feature-grid > .feature-card:not(.feature-wide)::before,
+  .guide-panel::before,
+  .product-shot img { transition: none !important; }
+}
