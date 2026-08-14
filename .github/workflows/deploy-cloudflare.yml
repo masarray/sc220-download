@@ -1,9 +1,6 @@
 name: Deploy SC220 Live to Cloudflare Pages
 
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
 
 permissions:
@@ -39,8 +36,6 @@ jobs:
             echo "Cloudflare deployment is prepared but skipped until CLOUDFLARE_API_TOKEN is configured as a repository secret."
           fi
 
-      # Project bootstrap was completed on the first production run. Routine deploys
-      # intentionally target the existing `sc220` project instead of trying to create it.
       - name: Deploy sc220.pages.dev with latest Wrangler
         if: steps.credentials.outputs.ready == 'true'
         shell: bash
@@ -51,43 +46,6 @@ jobs:
             --branch=main \
             --commit-dirty=true
 
-      - name: Verify production origin and SEO signals
+      - name: Verify production release contract and SEO signals
         if: steps.credentials.outputs.ready == 'true'
-        shell: bash
-        run: |
-          set -euo pipefail
-          origin="https://sc220.pages.dev"
-          mkdir -p /tmp/sc220-smoke
-
-          fetch() {
-            local path="$1"
-            local output="$2"
-            echo "Checking ${origin}${path}"
-            curl --fail --location --silent --show-error \
-              --retry 10 --retry-delay 3 --retry-all-errors \
-              --connect-timeout 10 --max-time 30 \
-              "${origin}${path}" -o "$output"
-          }
-
-          fetch "/" /tmp/sc220-smoke/index.html
-          fetch "/en/" /tmp/sc220-smoke/en.html
-          fetch "/download/" /tmp/sc220-smoke/download.html
-          fetch "/en/download/" /tmp/sc220-smoke/download-en.html
-          fetch "/sc220-mkii-audio-interface/support/" /tmp/sc220-smoke/support.html
-          fetch "/sitemap.xml" /tmp/sc220-smoke/sitemap.xml
-          fetch "/robots.txt" /tmp/sc220-smoke/robots.txt
-          fetch "/app.js" /tmp/sc220-smoke/app.js
-
-          grep -Fq 'rel="canonical" href="https://sc220.pages.dev/"' /tmp/sc220-smoke/index.html
-          grep -Fq 'rel="canonical" href="https://sc220.pages.dev/en/"' /tmp/sc220-smoke/en.html
-          grep -Fq 'rel="canonical" href="https://sc220.pages.dev/download/"' /tmp/sc220-smoke/download.html
-          grep -Fq 'rel="canonical" href="https://sc220.pages.dev/en/download/"' /tmp/sc220-smoke/download-en.html
-          grep -Fq '"@type":"SoftwareApplication"' /tmp/sc220-smoke/download.html
-          grep -Fq '"offers":{"@type":"Offer","price":"0"' /tmp/sc220-smoke/download.html
-          grep -Fq '<title>Driver & Support Recording Tech SC220 MKII – Windows 10/11</title>' /tmp/sc220-smoke/support.html
-          grep -Fq '<loc>https://sc220.pages.dev/download/</loc>' /tmp/sc220-smoke/sitemap.xml
-          grep -Fq '<loc>https://sc220.pages.dev/en/download/</loc>' /tmp/sc220-smoke/sitemap.xml
-          grep -Fq 'Sitemap: https://sc220.pages.dev/sitemap.xml' /tmp/sc220-smoke/robots.txt
-          grep -Fq 'const siteBase = isGitHubPagesMirror ? "/sc220-download/" : "/";' /tmp/sc220-smoke/app.js
-
-          echo "Production smoke test passed: download intent, driver/support intent, canonical SEO, sitemap, and dual-origin routing are live."
+        run: bash scripts/verify-production-release.sh https://sc220.pages.dev

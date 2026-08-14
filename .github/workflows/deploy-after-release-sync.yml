@@ -12,6 +12,10 @@ permissions:
   actions: write
   contents: read
 
+concurrency:
+  group: sc220-deploy-after-sync
+  cancel-in-progress: true
+
 jobs:
   deploy:
     if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'

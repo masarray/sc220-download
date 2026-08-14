@@ -4,6 +4,11 @@ on:
   push:
     branches:
       - main
+  workflow_run:
+    workflows:
+      - Publish verified SC220 draft release
+    types:
+      - completed
   workflow_dispatch:
 
 permissions:
@@ -15,6 +20,7 @@ concurrency:
 
 jobs:
   sync:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout public distribution repository
@@ -76,6 +82,7 @@ jobs:
             exit 1
           fi
 
+          bash -n scripts/verify-production-release.sh
           git diff --check
           bash scripts/build-static-site.sh cloudflare
 
