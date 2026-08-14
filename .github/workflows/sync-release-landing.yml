@@ -28,11 +28,17 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Stage verified release behind production gate
+      - name: Assert verified candidate is still gated as prerelease
         if: github.event_name == 'workflow_run'
         env:
           GH_TOKEN: ${{ github.token }}
         run: bash scripts/manage-production-release.sh stage
+
+      - name: Assert normal sync points only to stable/latest
+        if: github.event_name != 'workflow_run'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash scripts/manage-production-release.sh verify-stable
 
       - name: Synchronize latest.json to every public release surface
         run: python3 scripts/sync-release-metadata.py
@@ -88,8 +94,19 @@ jobs:
             exit 1
           fi
 
+          # P3 invariant: the publication workflow itself may never make a candidate stable/latest.
+          grep -Fq -- '-F prerelease=true' scripts/publish-release-candidate.sh
+          grep -Fq -- '-f make_latest=false' scripts/publish-release-candidate.sh
+          grep -Fq 'previous_latest_tag' scripts/publish-release-candidate.sh
+          grep -Fq 'Publish verified candidate behind production gate' .github/workflows/publish-draft-release.yml
+          if grep -Fq -- '--draft=false --latest' .github/workflows/publish-draft-release.yml; then
+            echo "Atomic release regression: publish workflow can still publish directly as latest." >&2
+            exit 1
+          fi
+
           bash -n scripts/verify-production-release.sh
           bash -n scripts/manage-production-release.sh
+          bash -n scripts/publish-release-candidate.sh
           git diff --check
           bash scripts/build-static-site.sh cloudflare
 
