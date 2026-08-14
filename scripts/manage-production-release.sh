@@ -26,32 +26,78 @@ get_release() {
   gh api "repos/$REPOSITORY/releases/tags/$tag"
 }
 
+get_latest_tag() {
+  gh api "repos/$REPOSITORY/releases/latest" --jq '.tag_name' 2>/dev/null || true
+}
+
 stage_release() {
-  local release release_id is_draft
+  local release is_draft is_prerelease latest_tag
   release="$(get_release)"
-  release_id="$(jq -r '.id' <<<"$release")"
   is_draft="$(jq -r '.draft' <<<"$release")"
+  is_prerelease="$(jq -r '.prerelease' <<<"$release")"
+  latest_tag="$(get_latest_tag)"
 
   if [[ "$is_draft" != "false" ]]; then
-    echo "$tag is still a draft. The verified publish workflow must complete before production staging." >&2
+    echo "Atomic release violation: $tag is still a draft after the verified publish workflow." >&2
+    exit 1
+  fi
+  if [[ "$is_prerelease" != "true" ]]; then
+    echo "Atomic release violation: $tag reached the sync gate as a full/stable release instead of a prerelease." >&2
+    exit 1
+  fi
+  if [[ "$latest_tag" == "$tag" ]]; then
+    echo "Atomic release violation: prerelease candidate $tag is already GitHub latest before production verification." >&2
     exit 1
   fi
 
-  echo "Staging $tag as prerelease until the production gate passes."
-  gh api --method PATCH "repos/$REPOSITORY/releases/$release_id" \
-    -F prerelease=true \
-    -f make_latest=false >/dev/null
+  echo "$tag is correctly staged behind the production gate: published prerelease, not stable/latest."
+}
 
+verify_stable_release() {
+  local release is_draft is_prerelease latest_tag
   release="$(get_release)"
-  [[ "$(jq -r '.draft' <<<"$release")" == "false" ]]
-  [[ "$(jq -r '.prerelease' <<<"$release")" == "true" ]]
-  echo "$tag is staged: public assets remain reachable, but it is not the stable/latest release."
+  is_draft="$(jq -r '.draft' <<<"$release")"
+  is_prerelease="$(jq -r '.prerelease' <<<"$release")"
+  latest_tag="$(get_latest_tag)"
+
+  if [[ "$is_draft" != "false" || "$is_prerelease" != "false" ]]; then
+    echo "Normal/manual sync refused: latest.json points to $tag, but that release is not stable." >&2
+    exit 1
+  fi
+  if [[ "$latest_tag" != "$tag" ]]; then
+    echo "Normal/manual sync refused: latest.json points to $tag, but GitHub stable/latest is '${latest_tag:-unset}'." >&2
+    exit 1
+  fi
+
+  echo "latest.json is lifecycle-safe: $tag is the current stable/latest GitHub release."
 }
 
 promote_release() {
-  local release release_id latest_tag
+  local release release_id is_draft is_prerelease latest_tag
   release="$(get_release)"
   release_id="$(jq -r '.id' <<<"$release")"
+  is_draft="$(jq -r '.draft' <<<"$release")"
+  is_prerelease="$(jq -r '.prerelease' <<<"$release")"
+  latest_tag="$(get_latest_tag)"
+
+  if [[ "$is_draft" != "false" ]]; then
+    echo "Refusing to promote draft release $tag." >&2
+    exit 1
+  fi
+
+  if [[ "$is_prerelease" == "false" ]]; then
+    if [[ "$latest_tag" == "$tag" ]]; then
+      echo "$tag is already production-ready and stable/latest."
+      return 0
+    fi
+    echo "$tag is already a full release but is not GitHub latest. Refusing ambiguous promotion." >&2
+    exit 1
+  fi
+
+  if [[ "$latest_tag" == "$tag" ]]; then
+    echo "Atomic release invariant broken: prerelease $tag must not already be latest." >&2
+    exit 1
+  fi
 
   echo "Promoting production-verified $tag to stable/latest."
   gh api --method PATCH "repos/$REPOSITORY/releases/$release_id" \
@@ -63,9 +109,9 @@ promote_release() {
   [[ "$(jq -r '.draft' <<<"$release")" == "false" ]]
   [[ "$(jq -r '.prerelease' <<<"$release")" == "false" ]]
 
-  latest_tag="$(gh api "repos/$REPOSITORY/releases/latest" --jq '.tag_name')"
+  latest_tag="$(get_latest_tag)"
   if [[ "$latest_tag" != "$tag" ]]; then
-    echo "GitHub latest release did not promote to $tag (got $latest_tag)." >&2
+    echo "GitHub latest release did not promote to $tag (got ${latest_tag:-unset})." >&2
     exit 1
   fi
 
@@ -232,10 +278,11 @@ rollback_release() {
 
 case "$ACTION" in
   stage) stage_release ;;
+  verify-stable) verify_stable_release ;;
   promote) promote_release ;;
   rollback) rollback_release ;;
   *)
-    echo "Usage: $0 {stage|promote|rollback}" >&2
+    echo "Usage: $0 {stage|verify-stable|promote|rollback}" >&2
     exit 2
     ;;
 esac
