@@ -14,7 +14,7 @@
 
 <p align="center">
   <a href="https://sc220.pages.dev/">
-    <img src="sc220-live-console.png" alt="Tampilan mixer Windows SC220 Live dengan input SC220, audio PC, DSP, meter, dan output streaming" width="960">
+    <img src="assets/screenshot/Screenshot.webp" alt="Tampilan mixer Windows SC220 Live dengan input SC220, audio PC, DSP, meter, dan output streaming" width="960">
   </a>
 </p>
 
@@ -29,25 +29,20 @@ SC220 Live ditujukan untuk kreator, pengguna karaoke, pengajar, musisi, reviewer
 
 ## Rilis stabil saat ini
 
-**SC220 Live v0.1.1** — diterbitkan **10 Agustus 2026** untuk Windows 10/11 x64.
+**SC220 Live v0.1.2** — diterbitkan **14 Agustus 2026** untuk Windows 10/11 x64.
 
 | Item | Rilis saat ini |
 |---|---|
 | Halaman download resmi | [sc220.pages.dev/download](https://sc220.pages.dev/download/) |
-| Installer Windows | [SC220-Live-v0.1.1-Setup-win-x64.exe](https://github.com/masarray/sc220-download/releases/download/v0.1.1/SC220-Live-v0.1.1-Setup-win-x64.exe) |
-| Ukuran installer | 24.043.506 byte (sekitar 22,9 MiB) |
-| Catatan rilis | [RELEASE_NOTES_v0.1.1.md](RELEASE_NOTES_v0.1.1.md) |
+| Installer Windows | [SC220-Live-v0.1.2-Setup-win-x64.exe](https://github.com/masarray/sc220-download/releases/download/v0.1.2/SC220-Live-v0.1.2-Setup-win-x64.exe) |
+| Ukuran installer | Lihat metadata asset pada [GitHub Release v0.1.2](https://github.com/masarray/sc220-download/releases/tag/v0.1.2) |
+| Catatan rilis | [RELEASE_NOTES_v0.1.2.md](RELEASE_NOTES_v0.1.2.md) |
 | Metadata machine-readable | [latest.json](latest.json) |
-| GitHub Release | [v0.1.1](https://github.com/masarray/sc220-download/releases/tag/v0.1.1) |
+| GitHub Release | [v0.1.2](https://github.com/masarray/sc220-download/releases/tag/v0.1.2) |
 
-### Yang baru di v0.1.1
+### Yang baru di v0.1.2
 
-- Engine pemrosesan disinkronkan ke authority produksi **ASK-P v0.5.24** yang disetujui.
-- Reference Bypass memakai jalur input bersama yang selaras latensi dengan transisi halus.
-- Smart installer memeriksa Microsoft Visual C++ Runtime, kesiapan Windows Audio, dan kesiapan VB-CABLE sebelum aplikasi dijalankan.
-- Analyzer stereo tetap membaca konten anti-phase dengan mengevaluasi energi kanal kiri dan kanan secara terpisah.
-- Kontrak packaging dan verifikasi release diperkuat agar distribusi publik lebih reliable.
-- SC220 Live tetap memakai lima macro kreatif yang sama; **Gain Match tetap OFF secara default dan tidak ditampilkan di UI publik**.
+Lihat [RELEASE_NOTES_v0.1.2.md](RELEASE_NOTES_v0.1.2.md) untuk perubahan, instalasi, dan detail integritas release terbaru.
 
 ## Kemampuan utama
 
@@ -79,13 +74,13 @@ SC220 Live **bukan** software kontrol Recording Tech KTV Pro K500. Penjelasan pe
 SHA-256 installer saat ini:
 
 ```text
-589b174357cb36c62611d7a0e89bfa6a7d25251fc27015b5dd5b25fb54c04686
+ba6c61617d8c796dd953234e50f6d2e179c5efbe5e281892da7e7ba977e55693
 ```
 
 Jalankan di Windows PowerShell:
 
 ```powershell
-Get-FileHash .\SC220-Live-v0.1.1-Setup-win-x64.exe -Algorithm SHA256
+Get-FileHash .\SC220-Live-v0.1.2-Setup-win-x64.exe -Algorithm SHA256
 ```
 
 Hasilnya harus sama persis dengan checksum yang dipublikasikan. Release juga menyediakan file `.sha256` dan manifest supply-chain.
@@ -156,6 +151,6 @@ SC220 Live dikelola oleh MasArray / Recording Tech. Windows, OBS Studio, TikTok,
 ---
 
 <div align="center">
-  <strong>SC220 Live v0.1.1</strong><br>
+  <strong>SC220 Live v0.1.2</strong><br>
   Routing bersih. Kontrol jelas. Siap siaran.
 </div>

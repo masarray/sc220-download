@@ -15,7 +15,7 @@
 
 <p align="center">
   <a href="https://sc220.pages.dev/">
-    <img src="sc220-live-console.png" alt="SC220 Live Windows mixer interface with SC220 input, PC audio, DSP, meters, and streaming output" width="960">
+    <img src="assets/screenshot/Screenshot.webp" alt="SC220 Live Windows mixer interface with SC220 input, PC audio, DSP, meters, and streaming output" width="960">
   </a>
 </p>
 
@@ -30,25 +30,20 @@ It is intended for creators, karaoke users, educators, musicians, reviewers, and
 
 ## Current stable release
 
-**SC220 Live v0.1.1** — published **August 10, 2026** for Windows 10/11 x64.
+**SC220 Live v0.1.2** — published **August 14, 2026** for Windows 10/11 x64.
 
 | Item | Current release |
 |---|---|
 | Official download page | [sc220.pages.dev/en/download](https://sc220.pages.dev/en/download/) |
-| Windows installer | [SC220-Live-v0.1.1-Setup-win-x64.exe](https://github.com/masarray/sc220-download/releases/download/v0.1.1/SC220-Live-v0.1.1-Setup-win-x64.exe) |
-| Installer size | 24,043,506 bytes (about 22.9 MiB) |
-| Release notes | [RELEASE_NOTES_v0.1.1.md](RELEASE_NOTES_v0.1.1.md) |
+| Windows installer | [SC220-Live-v0.1.2-Setup-win-x64.exe](https://github.com/masarray/sc220-download/releases/download/v0.1.2/SC220-Live-v0.1.2-Setup-win-x64.exe) |
+| Installer size | See asset metadata on [GitHub Release v0.1.2](https://github.com/masarray/sc220-download/releases/tag/v0.1.2) |
+| Release notes | [RELEASE_NOTES_v0.1.2.md](RELEASE_NOTES_v0.1.2.md) |
 | Machine-readable metadata | [latest.json](latest.json) |
-| GitHub Release | [v0.1.1](https://github.com/masarray/sc220-download/releases/tag/v0.1.1) |
+| GitHub Release | [v0.1.2](https://github.com/masarray/sc220-download/releases/tag/v0.1.2) |
 
-### What changed in v0.1.1
+### What changed in v0.1.2
 
-- Processing engine synchronized to the approved **ASK-P v0.5.24** production authority.
-- Reference Bypass uses a latency-aligned shared input path with smooth transitions.
-- Smart installer checks Microsoft Visual C++ Runtime, Windows Audio readiness, and VB-CABLE readiness before launch.
-- Stereo analyzer preserves anti-phase content by evaluating left/right channel energy independently.
-- Release packaging and verification contracts were hardened for more reliable public distribution.
-- SC220 Live still exposes the same five creative macros; **Gain Match remains disabled by default and is not exposed in the public UI**.
+See [RELEASE_NOTES_v0.1.2.md](RELEASE_NOTES_v0.1.2.md) for the latest changes, installation notes, and release-integrity details.
 
 ## Core capabilities
 
@@ -80,13 +75,13 @@ SC220 Live is **not** control software for Recording Tech KTV Pro K500. For a cl
 Current installer SHA-256:
 
 ```text
-589b174357cb36c62611d7a0e89bfa6a7d25251fc27015b5dd5b25fb54c04686
+ba6c61617d8c796dd953234e50f6d2e179c5efbe5e281892da7e7ba977e55693
 ```
 
 On Windows PowerShell:
 
 ```powershell
-Get-FileHash .\SC220-Live-v0.1.1-Setup-win-x64.exe -Algorithm SHA256
+Get-FileHash .\SC220-Live-v0.1.2-Setup-win-x64.exe -Algorithm SHA256
 ```
 
 The result must match the published checksum exactly. Release assets also include a `.sha256` file and a supply-chain manifest.
@@ -157,6 +152,6 @@ SC220 Live is maintained by MasArray / Recording Tech. Windows, OBS Studio, TikT
 ---
 
 <div align="center">
-  <strong>SC220 Live v0.1.1</strong><br>
+  <strong>SC220 Live v0.1.2</strong><br>
   Clean routing. Clear controls. Ready for broadcast.
 </div>

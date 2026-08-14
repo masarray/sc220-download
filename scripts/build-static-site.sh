@@ -35,6 +35,7 @@ done < <(find dist -type f \( -name '*.html' -o -name '*.xml' -o -name '*.txt' -
 # Enrich the deployed HTML without duplicating large static source files. These
 # transforms keep both hosting origins identical while the canonical remains Cloudflare.
 python3 - <<'PY'
+import json
 from pathlib import Path
 
 
@@ -48,14 +49,14 @@ def replace_once(path, old, new, label):
 # Homepage: make the large above-the-fold screenshot a high-priority LCP candidate.
 replace_once(
     "dist/index.html",
-    '<img src="sc220-live-console.png" width="1680" height="945" alt=',
-    '<img src="sc220-live-console.png" width="1680" height="945" fetchpriority="high" decoding="async" alt=',
+    '<img src="assets/screenshot/Screenshot.webp" alt=',
+    '<img src="assets/screenshot/Screenshot.webp" fetchpriority="high" decoding="async" alt=',
     "id hero fetchpriority",
 )
 replace_once(
     "dist/en/index.html",
-    '<img src="../sc220-live-console.png" width="1680" height="945" alt=',
-    '<img src="../sc220-live-console.png" width="1680" height="945" fetchpriority="high" decoding="async" alt=',
+    '<img src="../assets/screenshot/Screenshot.webp" alt=',
+    '<img src="../assets/screenshot/Screenshot.webp" fetchpriority="high" decoding="async" alt=',
     "en hero fetchpriority",
 )
 
@@ -74,20 +75,20 @@ replace_once(
     "en contextual hardware link",
 )
 
-# Homepage: provide the fields Google documents for SoftwareApplication rich-result
-# eligibility while keeping the visible licensing/download statements consistent.
-replace_once(
-    "dist/index.html",
-    '"inLanguage":"id-ID",\n        "description":',
-    '"inLanguage":"id-ID",\n        "softwareVersion":"0.1.0",\n        "datePublished":"2026-08-06",\n        "isAccessibleForFree":true,\n        "offers":{"@type":"Offer","price":"0","priceCurrency":"IDR","availability":"https://schema.org/InStock","url":"https://sc220.pages.dev/download/"},\n        "description":',
-    "id software offers",
-)
-replace_once(
-    "dist/en/index.html",
-    '"inLanguage":"en-US","description":',
-    '"inLanguage":"en-US","softwareVersion":"0.1.0","datePublished":"2026-08-06","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD","availability":"https://schema.org/InStock","url":"https://sc220.pages.dev/en/download/"},"description":',
-    "en software offers",
-)
+# Homepage release schema is source-controlled and synchronized from latest.json.
+release = json.loads(Path("dist/latest.json").read_text(encoding="utf-8"))
+for page in ("dist/index.html", "dist/en/index.html"):
+    page_text = Path(page).read_text(encoding="utf-8")
+    expected = (
+        f'"softwareVersion":"{release["version"]}"',
+        f'"datePublished":"{release["published"]}"',
+        f'"downloadUrl":"{release["download"]}"',
+        'assets/screenshot/Screenshot.webp',
+        '"offers":{"@type":"Offer","price":"0"',
+    )
+    missing = [item for item in expected if item not in page_text]
+    if missing:
+        raise SystemExit(f"Release schema drift in {page}: {missing}")
 
 # Homepage footer: make key SEO hubs statically discoverable from the strongest page.
 replace_once(
