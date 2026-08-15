@@ -1,1 +1,21 @@
-/* Deprecated: no CSS ownership here. Homepage styles are owned by landing-v3.css. Kept temporarily only because index.html still references this path. */
+/*
+ * Homepage legacy-isolation guard only.
+ * NOT a visual owner. landing-v3.css owns the landing design.
+ * These declarations neutralize expensive properties inherited from legacy styles.css
+ * until the old <link> is removed from homepage markup.
+ */
+body.landing-page .site-header {
+  -webkit-backdrop-filter:none !important;
+  backdrop-filter:none !important;
+}
+body.landing-page .product-stage {
+  transform:none !important;
+  transform-origin:center !important;
+  will-change:auto !important;
+}
+body.landing-page .release-card,
+body.landing-page .trust-panel,
+body.landing-page .feature-visual-label {
+  -webkit-backdrop-filter:none !important;
+  backdrop-filter:none !important;
+}
