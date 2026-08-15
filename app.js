@@ -256,7 +256,7 @@
     if (faq) {
       faq.innerHTML = isEnglish
         ? `<p class="eyebrow dark" data-reveal>THE BASICS</p><h2 data-reveal style="--reveal-delay:60ms">A few things you may want to know before downloading.</h2>
-          <details data-reveal style="--reveal-delay:90ms"><summary><span>Is SC220 Live free?</span>${chevron}</summary><p><strong>Yes. You can keep using SC220 Live for free.</strong> If you want to unlock the full feature set, activation is available from inside the app. There is no need to decide right away—download it, try it with your setup, and activate only when you want the full features.</p></details>
+          <details data-reveal style="--reveal-delay:90ms"><summary><span>Is SC220 Live free?</span>${chevron}</summary><p><strong>Yes. You can keep using SC220 Live for free, for as long as you like.</strong> There is no required subscription, login, credit card, or payment just to keep using the app. If you enjoy SC220 Live and want the full-control version, you can activate it from the License Activation menu. Activation is optional and priced to stay accessible.</p></details>
           <details data-reveal style="--reveal-delay:120ms"><summary><span>Do I need a Recording Tech SC220?</span>${chevron}</summary><p><strong>No.</strong> The SC220 is the interface we test and document most often, but SC220 Live is not locked to that hardware. Other Windows audio interfaces can be tried as long as Windows sees the device correctly and the routing suits your setup.</p></details>
           <details data-reveal style="--reveal-delay:150ms"><summary><span>Is there a Mac version?</span>${chevron}</summary><p><strong>Yes.</strong> The macOS version is distributed separately from the Windows installer shown on this page. The main download button here is for Windows x64, so make sure you choose the build that matches your operating system.</p></details>
           <details data-reveal style="--reveal-delay:180ms"><summary><span>How do I download and install it?</span>${chevron}</summary><p>Click <strong>Download SC220 Live</strong>, open the installer you just downloaded, follow the setup steps, then open SC220 Live and choose your audio interface and output. If you are new to audio routing, start with the default setup first—you can fine-tune it later.</p></details>
@@ -265,7 +265,7 @@
           <details data-reveal style="--reveal-delay:270ms"><summary><span>Is SC220 Live a karaoke song player?</span>${chevron}</summary><p>No. SC220 Live handles <strong>mixing, sound processing, metering, and routing</strong>. It does not provide a song catalogue or lyrics. Use your usual karaoke or playback app for the music, then bring that audio into SC220 Live.</p></details>
           <details data-reveal style="--reveal-delay:300ms"><summary><span>Can I use it with OBS or TikTok Live Studio?</span>${chevron}</summary><p>Yes. That is one of the common workflows. Send the final mix to a suitable Windows audio endpoint, then choose that same endpoint as the audio input inside OBS, TikTok Live Studio, or another compatible app.</p></details>`
         : `<p class="eyebrow dark" data-reveal>PERTANYAAN DASAR</p><h2 data-reveal style="--reveal-delay:60ms">Sebelum download, mungkin ini yang ingin Anda tanyakan.</h2>
-          <details data-reveal style="--reveal-delay:90ms"><summary><span>SC220 Live gratis atau berbayar?</span>${chevron}</summary><p><strong>Bisa dipakai gratis selamanya.</strong> Kalau Anda ingin membuka seluruh fitur, aktivasi tersedia dari dalam aplikasi. Jadi tidak perlu buru-buru memutuskan—download, coba dulu di setup Anda, lalu aktivasi kalau memang ingin memakai full fitur.</p></details>
+          <details data-reveal style="--reveal-delay:90ms"><summary><span>SC220 Live gratis atau berbayar?</span>${chevron}</summary><p><strong>Gratis, dan boleh dipakai selamanya.</strong> Tidak ada kewajiban subscription, login, kartu kredit, atau pembayaran supaya aplikasinya tetap bisa digunakan. Kalau nanti Anda suka dengan SC220 Live dan ingin menikmati versi full control, aktivasi tersedia di menu <strong>License Activation</strong>. Aktivasi sepenuhnya pilihan Anda, dan harganya dibuat tetap terjangkau.</p></details>
           <details data-reveal style="--reveal-delay:120ms"><summary><span>Apakah harus punya Recording Tech SC220?</span>${chevron}</summary><p><strong>Tidak harus.</strong> SC220 memang perangkat yang paling sering kami uji dan dokumentasikan, tetapi aplikasinya tidak dikunci hanya untuk SC220. Audio interface lain boleh dicoba selama terbaca dengan baik di Windows dan routing-nya cocok dengan setup Anda.</p></details>
           <details data-reveal style="--reveal-delay:150ms"><summary><span>Ada versi untuk Mac?</span>${chevron}</summary><p><strong>Ada.</strong> Versi macOS didistribusikan terpisah dari installer Windows yang tampil di halaman ini. Tombol download utama di sini adalah untuk Windows x64, jadi pastikan Anda memilih build yang sesuai dengan sistem operasi yang dipakai.</p></details>
           <details data-reveal style="--reveal-delay:180ms"><summary><span>Bagaimana cara download dan install?</span>${chevron}</summary><p>Klik <strong>Unduh SC220 Live</strong>, buka installer yang baru selesai didownload, ikuti langkah setup, lalu jalankan SC220 Live dan pilih audio interface serta output yang ingin dipakai. Kalau masih awam soal routing, mulai saja dari setup yang paling sederhana dulu—nanti bisa dirapikan pelan-pelan.</p></details>
@@ -284,36 +284,38 @@
     if (heroEyebrow) heroEyebrow.textContent = isEnglish ? "SC220 LIVE • FREE TO USE" : "SC220 LIVE • GRATIS DIPAKAI";
 
     const heroTrust = Array.from(document.querySelectorAll(".hero-trust span"));
-    if (heroTrust[0]) heroTrust[0].innerHTML = `<svg class="lucide" aria-hidden="true"><use href="#icon-check"/></svg>${isEnglish ? "Free to keep using" : "Gratis dipakai selamanya"}`;
-    if (heroTrust[1]) heroTrust[1].innerHTML = `<svg class="lucide" aria-hidden="true"><use href="#icon-check"/></svg>${isEnglish ? "Full features via activation" : "Full fitur lewat aktivasi"}`;
+    if (heroTrust[0]) heroTrust[0].innerHTML = `<svg class="lucide" aria-hidden="true"><use href="#icon-check"/></svg>${isEnglish ? "Free forever" : "Gratis dipakai selamanya"}`;
+    if (heroTrust[1]) heroTrust[1].innerHTML = `<svg class="lucide" aria-hidden="true"><use href="#icon-check"/></svg>${isEnglish ? "No login or subscription required" : "Tanpa login atau subscription wajib"}`;
 
     const confidence = document.querySelector(".confidence-item");
     if (confidence) {
       const small = confidence.querySelector("small");
       const strong = confidence.querySelector("strong");
       const text = confidence.querySelector("span");
-      if (small) small.textContent = isEnglish ? "FREE TO USE" : "GRATIS SELAMANYA";
-      if (strong) strong.textContent = isEnglish ? "Try it without a countdown" : "Pakai dulu tanpa takut masa habis";
-      if (text) text.textContent = isEnglish ? "The free version keeps working; full features are available through activation." : "Versi gratis tetap bisa dipakai; full fitur tersedia lewat aktivasi.";
+      if (small) small.textContent = isEnglish ? "FREE FOREVER" : "GRATIS SELAMANYA";
+      if (strong) strong.textContent = isEnglish ? "Download it. Use it. Keep it." : "Download. Pakai. Tetap gratis.";
+      if (text) text.textContent = isEnglish ? "No required login, subscription, credit card, or payment. Full-control activation is optional." : "Tanpa login, subscription wajib, kartu kredit, atau kewajiban membayar. Aktivasi full control sifatnya pilihan.";
     }
 
     const licence = document.querySelector(".licence-section");
     if (licence) {
+      const eyebrow = licence.querySelector(".licence-main .eyebrow");
       const title = licence.querySelector(".licence-main h2");
       const body = licence.querySelector(".licence-main > p:not(.eyebrow)");
       const afterSmall = licence.querySelector(".licence-after small");
       const afterTitle = licence.querySelector(".licence-after h3");
       const afterBody = licence.querySelector(".licence-after p");
-      if (title) title.textContent = isEnglish ? "Free to keep using. Activate when you want the full features." : "Gratis dipakai selamanya. Aktivasi kalau ingin full fitur.";
-      if (body) body.textContent = isEnglish ? "Use the free version for as long as you need. Get comfortable with your own setup first, then activate from inside the app whenever the full feature set makes sense for you." : "Versi gratis tetap bisa Anda pakai tanpa takut masa coba habis. Kenali dulu workflow di setup Anda, lalu aktivasi dari dalam aplikasi kalau memang ingin membuka seluruh fitur.";
-      if (afterSmall) afterSmall.textContent = isEnglish ? "FULL FEATURES" : "FULL FITUR";
-      if (afterTitle) afterTitle.textContent = isEnglish ? "Activate when you are ready" : "Aktivasi saat Anda sudah siap";
-      if (afterBody) afterBody.textContent = isEnglish ? "You do not have to decide before trying the app. The free version stays usable, while activation unlocks the complete feature set." : "Tidak perlu memutuskan sebelum mencoba. Versi gratis tetap bisa dipakai, sedangkan aktivasi membuka rangkaian fitur lengkap.";
+      if (eyebrow) eyebrow.textContent = isEnglish ? "FREE, WITHOUT THE CATCH" : "GRATIS, TANPA SYARAT RIBET";
+      if (title) title.textContent = isEnglish ? "Download it and use it for free, forever." : "Download dan gunakan gratis selamanya.";
+      if (body) body.textContent = isEnglish ? "SC220 Live does not require a paid subscription, account login, credit card, or payment just to keep working. Install it, use it with your own setup, and keep using the free version for as long as you like." : "Silakan gunakan SC220 Live tanpa takut masa gratis habis. Tidak ada subscription berbayar yang diwajibkan, tidak perlu login, tidak perlu kartu kredit, dan tidak ada kewajiban membayar agar aplikasinya tetap bisa dipakai. Download, install, lalu gunakan selama Anda membutuhkannya.";
+      if (afterSmall) afterSmall.textContent = isEnglish ? "IF YOU LOVE IT" : "KALAU ANDA SUKA";
+      if (afterTitle) afterTitle.textContent = isEnglish ? "Full control is there when you want it" : "Full control bisa diaktifkan kapan saja";
+      if (afterBody) afterBody.innerHTML = isEnglish ? "If SC220 Live becomes part of your daily setup and you want every control unlocked, open <strong>License Activation</strong> inside the app. Activation is optional and kept affordable. <span class=\"license-signature\">An innovation from Mas Ari for the world.</span>" : "Kalau SC220 Live ternyata cocok dan Anda ingin semua kontrol terbuka, cukup masuk ke menu <strong>License Activation</strong> di dalam aplikasi. Aktivasi ini tidak wajib, dan harganya juga dibuat tidak mahal. <span class=\"license-signature\">Inovasi dari Mas Ari untuk Dunia.</span>";
     }
 
     const reassurance = Array.from(document.querySelectorAll(".download-reassurance span"));
-    if (reassurance[0]) reassurance[0].innerHTML = `<svg class="lucide" aria-hidden="true"><use href="#icon-check"/></svg>${isEnglish ? "Free to keep using" : "Gratis dipakai selamanya"}`;
-    if (reassurance[1]) reassurance[1].innerHTML = `<svg class="lucide" aria-hidden="true"><use href="#icon-check"/></svg>${isEnglish ? "Full-feature activation available" : "Aktivasi full fitur tersedia"}`;
+    if (reassurance[0]) reassurance[0].innerHTML = `<svg class="lucide" aria-hidden="true"><use href="#icon-check"/></svg>${isEnglish ? "Free forever" : "Gratis dipakai selamanya"}`;
+    if (reassurance[1]) reassurance[1].innerHTML = `<svg class="lucide" aria-hidden="true"><use href="#icon-check"/></svg>${isEnglish ? "No required subscription" : "Tanpa subscription wajib"}`;
 
     if (userQuestions && requirementsFaq) {
       requirementsFaq.insertAdjacentElement("afterend", userQuestions);
