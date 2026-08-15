@@ -207,6 +207,7 @@
       nodes.forEach((node) => node.classList.add("is-visible"));
       return;
     }
+
     document.body.classList.add("motion-ready");
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
@@ -214,7 +215,8 @@
         entry.target.classList.add("is-visible");
         observer.unobserve(entry.target);
       });
-    }, { rootMargin: "0px 0px -7%", threshold: .08 });
+    }, { rootMargin: "80px 0px -6%", threshold: .04 });
+
     nodes.forEach((node) => observer.observe(node));
   };
 
@@ -230,21 +232,21 @@
         const rect = stage.getBoundingClientRect();
         const x = Math.min(1, Math.max(0, (event.clientX - rect.left) / rect.width));
         const y = Math.min(1, Math.max(0, (event.clientY - rect.top) / rect.height));
-        stage.style.setProperty("--tilt-x", `${(.5 - y) * 1.8}deg`);
-        stage.style.setProperty("--tilt-y", `${(x - .5) * 2.8}deg`);
+        stage.style.setProperty("--tilt-x", `${(.5 - y) * 1.2}deg`);
+        stage.style.setProperty("--tilt-y", `${(x - .5) * 2}deg`);
         stage.style.setProperty("--glow-x", `${x * 100}%`);
         stage.style.setProperty("--glow-y", `${y * 100}%`);
       });
     }, { passive: true });
     stage.addEventListener("pointerleave", () => {
-      stage.style.setProperty("--tilt-x", ".4deg");
-      stage.style.setProperty("--tilt-y", "-1.4deg");
+      stage.style.setProperty("--tilt-x", ".2deg");
+      stage.style.setProperty("--tilt-y", "-.8deg");
       stage.style.setProperty("--glow-x", "70%");
       stage.style.setProperty("--glow-y", "30%");
     });
   };
 
-  const refreshLandingFaqAndLicensing = () => {
+  const polishLandingCopy = () => {
     if (!isLandingPage) return;
 
     const chevron = `<svg class="lucide details-chevron" aria-hidden="true"><use href="#icon-chevron-down"/></svg>`;
@@ -253,39 +255,20 @@
     const userQuestions = document.querySelector(".user-questions-section");
     const requirementsFaq = document.querySelector(".requirements-faq");
 
-    if (faq) {
-      faq.innerHTML = isEnglish
-        ? `<p class="eyebrow dark" data-reveal>THE BASICS</p><h2 data-reveal style="--reveal-delay:60ms">A few things you may want to know before downloading.</h2>
-          <details data-reveal style="--reveal-delay:90ms"><summary><span>Is SC220 Live free?</span>${chevron}</summary><p><strong>Yes. You can keep using SC220 Live for free, for as long as you like.</strong> There is no required subscription, login, credit card, or payment just to keep using the app. If you enjoy SC220 Live and want the full-control version, you can activate it from the License Activation menu. Activation is optional and priced to stay accessible.</p></details>
-          <details data-reveal style="--reveal-delay:120ms"><summary><span>Do I need a Recording Tech SC220?</span>${chevron}</summary><p><strong>No.</strong> The SC220 is the interface we test and document most often, but SC220 Live is not locked to that hardware. Other Windows audio interfaces can be tried as long as Windows sees the device correctly and the routing suits your setup.</p></details>
-          <details data-reveal style="--reveal-delay:150ms"><summary><span>Is there a Mac version?</span>${chevron}</summary><p><strong>Yes.</strong> The macOS version is distributed separately from the Windows installer shown on this page. The main download button here is for Windows x64, so make sure you choose the build that matches your operating system.</p></details>
-          <details data-reveal style="--reveal-delay:180ms"><summary><span>How do I download and install it?</span>${chevron}</summary><p>Click <strong>Download SC220 Live</strong>, open the installer you just downloaded, follow the setup steps, then open SC220 Live and choose your audio interface and output. If you are new to audio routing, start with the default setup first—you can fine-tune it later.</p></details>
-          <details data-reveal style="--reveal-delay:210ms"><summary><span>SmartScreen says Windows protected my PC. What should I do?</span>${chevron}</summary><p>This can happen with software from a newer developer or an app that has not built up a large SmartScreen reputation yet. <strong>If you downloaded the installer from this official page and want to continue, click “More info”, then “Run anyway”.</strong> You do not need to disable your antivirus. If you want an extra check first, compare the SHA-256 shown on this page with the file you downloaded.</p></details>
-          <details data-reveal style="--reveal-delay:240ms"><summary><span>Do I have to install VB-CABLE?</span>${chevron}</summary><p>Not for every setup. VB-CABLE is useful when you need to pass the final SC220 Live mix into another Windows app as a virtual audio device, for example OBS or TikTok Live Studio. If your hardware or routing already provides the path you need, your setup may be different.</p></details>
-          <details data-reveal style="--reveal-delay:270ms"><summary><span>Is SC220 Live a karaoke song player?</span>${chevron}</summary><p>No. SC220 Live handles <strong>mixing, sound processing, metering, and routing</strong>. It does not provide a song catalogue or lyrics. Use your usual karaoke or playback app for the music, then bring that audio into SC220 Live.</p></details>
-          <details data-reveal style="--reveal-delay:300ms"><summary><span>Can I use it with OBS or TikTok Live Studio?</span>${chevron}</summary><p>Yes. That is one of the common workflows. Send the final mix to a suitable Windows audio endpoint, then choose that same endpoint as the audio input inside OBS, TikTok Live Studio, or another compatible app.</p></details>`
-        : `<p class="eyebrow dark" data-reveal>PERTANYAAN DASAR</p><h2 data-reveal style="--reveal-delay:60ms">Sebelum download, mungkin ini yang ingin Anda tanyakan.</h2>
-          <details data-reveal style="--reveal-delay:90ms"><summary><span>SC220 Live gratis atau berbayar?</span>${chevron}</summary><p><strong>Gratis, dan boleh dipakai selamanya.</strong> Tidak ada kewajiban subscription, login, kartu kredit, atau pembayaran supaya aplikasinya tetap bisa digunakan. Kalau nanti Anda suka dengan SC220 Live dan ingin menikmati versi full control, aktivasi tersedia di menu <strong>License Activation</strong>. Aktivasi sepenuhnya pilihan Anda, dan harganya dibuat tetap terjangkau.</p></details>
-          <details data-reveal style="--reveal-delay:120ms"><summary><span>Apakah harus punya Recording Tech SC220?</span>${chevron}</summary><p><strong>Tidak harus.</strong> SC220 memang perangkat yang paling sering kami uji dan dokumentasikan, tetapi aplikasinya tidak dikunci hanya untuk SC220. Audio interface lain boleh dicoba selama terbaca dengan baik di Windows dan routing-nya cocok dengan setup Anda.</p></details>
-          <details data-reveal style="--reveal-delay:150ms"><summary><span>Ada versi untuk Mac?</span>${chevron}</summary><p><strong>Ada.</strong> Versi macOS didistribusikan terpisah dari installer Windows yang tampil di halaman ini. Tombol download utama di sini adalah untuk Windows x64, jadi pastikan Anda memilih build yang sesuai dengan sistem operasi yang dipakai.</p></details>
-          <details data-reveal style="--reveal-delay:180ms"><summary><span>Bagaimana cara download dan install?</span>${chevron}</summary><p>Klik <strong>Unduh SC220 Live</strong>, buka installer yang baru selesai didownload, ikuti langkah setup, lalu jalankan SC220 Live dan pilih audio interface serta output yang ingin dipakai. Kalau masih awam soal routing, mulai saja dari setup yang paling sederhana dulu—nanti bisa dirapikan pelan-pelan.</p></details>
-          <details data-reveal style="--reveal-delay:210ms"><summary><span>SmartScreen bilang Windows melindungi PC. Harus bagaimana?</span>${chevron}</summary><p>Ini bisa muncul pada software dari developer yang masih baru atau aplikasi yang reputasinya belum banyak terbentuk di SmartScreen. <strong>Kalau installer memang Anda download dari halaman resmi ini dan ingin melanjutkan, klik “More info”, lalu pilih “Run anyway”.</strong> Tidak perlu mematikan antivirus. Kalau ingin lebih yakin sebelum lanjut, cocokkan SHA-256 di halaman ini dengan file yang Anda download.</p></details>
-          <details data-reveal style="--reveal-delay:240ms"><summary><span>Apakah harus install VB-CABLE?</span>${chevron}</summary><p>Tidak selalu. VB-CABLE berguna kalau hasil mix dari SC220 Live perlu dikirim ke aplikasi Windows lain sebagai virtual audio device, misalnya OBS atau TikTok Live Studio. Kalau hardware atau routing Anda sudah punya jalur sendiri, setup-nya bisa berbeda.</p></details>
-          <details data-reveal style="--reveal-delay:270ms"><summary><span>SC220 Live itu aplikasi pemutar karaoke?</span>${chevron}</summary><p>Bukan. SC220 Live menangani <strong>mixing, pengolahan suara, meter, dan routing audio</strong>. Lagu dan lirik tetap berasal dari aplikasi karaoke atau player yang biasa Anda gunakan, lalu audionya masuk ke SC220 Live.</p></details>
-          <details data-reveal style="--reveal-delay:300ms"><summary><span>Bisa dipakai untuk OBS atau TikTok Live Studio?</span>${chevron}</summary><p>Bisa. Ini salah satu workflow yang paling umum. Kirim mix akhir ke endpoint audio Windows yang sesuai, lalu pilih endpoint yang sama sebagai input audio di OBS, TikTok Live Studio, atau aplikasi kompatibel lainnya.</p></details>`;
-    }
-
-    if (requirements) {
-      const heading = requirements.querySelector("h2");
-      if (heading) heading.textContent = isEnglish ? "For the Windows installer on this page." : "Untuk installer Windows di halaman ini.";
-    }
-
     const heroEyebrow = document.querySelector(".hero .eyebrow");
     if (heroEyebrow) heroEyebrow.textContent = isEnglish ? "SC220 LIVE • FREE TO USE" : "SC220 LIVE • GRATIS DIPAKAI";
+
+    const heroLead = document.querySelector(".hero-lead");
+    if (heroLead) heroLead.textContent = isEnglish
+      ? "Use a Recording Tech SC220 or another audio interface? Both are welcome. SC220 Live brings your interface and PC audio into one clear Windows console, so you can balance levels, shape the sound, check the meters, and send the final mix to OBS or TikTok Live Studio without making the setup feel complicated."
+      : "Pakai Recording Tech SC220 atau audio interface lain? Boleh. SC220 Live menyatukan suara dari interface dan audio PC dalam satu console Windows yang mudah dibaca. Atur level, rapikan karakter suara, cek meter, lalu kirim mix akhir ke OBS atau TikTok Live Studio tanpa membuat setup terasa rumit.";
 
     const heroTrust = Array.from(document.querySelectorAll(".hero-trust span"));
     if (heroTrust[0]) heroTrust[0].innerHTML = `<svg class="lucide" aria-hidden="true"><use href="#icon-check"/></svg>${isEnglish ? "Free forever" : "Gratis dipakai selamanya"}`;
     if (heroTrust[1]) heroTrust[1].innerHTML = `<svg class="lucide" aria-hidden="true"><use href="#icon-check"/></svg>${isEnglish ? "No login or subscription required" : "Tanpa login atau subscription wajib"}`;
+
+    const heroNote = document.querySelector(".hero-note");
+    if (heroNote) heroNote.innerHTML = `<svg class="lucide" aria-hidden="true"><use href="#icon-circle-help"/></svg>${isEnglish ? "New to audio routing? The common questions are answered below." : "Masih awam soal routing audio? Pertanyaan yang paling sering muncul sudah dijawab di bawah."}`;
 
     const confidence = document.querySelector(".confidence-item");
     if (confidence) {
@@ -297,6 +280,34 @@
       if (text) text.textContent = isEnglish ? "No required login, subscription, credit card, or payment. Full-control activation is optional." : "Tanpa login, subscription wajib, kartu kredit, atau kewajiban membayar. Aktivasi full control sifatnya pilihan.";
     }
 
+    const flowHeading = document.querySelector("#cara-kerja .section-heading h2, #how-it-works .section-heading h2");
+    const flowLead = document.querySelector("#cara-kerja .section-heading > p, #how-it-works .section-heading > p");
+    if (flowHeading) flowHeading.textContent = isEnglish ? "Four simple steps from input to live." : "Empat langkah sederhana, dari suara masuk sampai siap live.";
+    if (flowLead) flowLead.textContent = isEnglish ? "Start with the basics: choose the source, balance it, check the level, then send the final mix to your live app." : "Mulai dari yang paling gampang: pilih sumber suara, atur keseimbangannya, cek level, lalu kirim mix akhir ke aplikasi live.";
+
+    const featureHeading = document.querySelector("#fitur .section-heading h2, #features .section-heading h2");
+    const featureLead = document.querySelector("#fitur .section-heading > p, #features .section-heading > p");
+    if (featureHeading) featureHeading.textContent = isEnglish ? "The controls you actually need, explained one at a time." : "Kontrol yang sering dipakai, dijelaskan satu per satu.";
+    if (featureLead) featureLead.textContent = isEnglish ? "Choose a topic and the screenshot follows it. No guessing which caption belongs to which part of the app." : "Pilih topiknya, lalu gambar akan mengikuti. Jadi tidak perlu menebak caption mana yang sedang menjelaskan bagian tertentu.";
+
+    const trustTitle = document.querySelector(".trust-copy h2");
+    const trustBody = document.querySelector(".trust-copy > p:not(.eyebrow)");
+    const smartSummary = document.querySelector(".smartscreen-box summary span");
+    const smartBody = document.querySelector(".smartscreen-box p");
+    if (trustTitle) trustTitle.textContent = isEnglish ? "SmartScreen appeared? That can be normal." : "SmartScreen muncul? Tenang, ini bisa terjadi.";
+    if (trustBody) trustBody.innerHTML = isEnglish
+      ? "Windows can show this message for software from a newer developer or an app that has not built up a large SmartScreen reputation yet. <strong>Download from this official page first.</strong> If you want to continue, choose <strong>More info → Run anyway</strong>. You do not need to turn off your antivirus."
+      : "Windows kadang menampilkan peringatan ini pada software dari developer baru atau aplikasi yang reputasinya belum banyak terbentuk di SmartScreen. <strong>Pastikan installer berasal dari halaman resmi ini.</strong> Kalau ingin lanjut, pilih <strong>More info → Run anyway</strong>. Tidak perlu mematikan antivirus.";
+    if (smartSummary) smartSummary.textContent = isEnglish ? "Want an extra check before installing?" : "Ingin cek file dulu sebelum install?";
+    if (smartBody) smartBody.textContent = isEnglish
+      ? "Compare the SHA-256 on this page with the file you downloaded. It is an optional integrity check for users who want extra assurance."
+      : "Cocokkan SHA-256 yang tampil di halaman ini dengan file yang Anda download. Ini langkah tambahan bila Anda ingin memastikan file yang diterima sama dengan rilis resmi.";
+
+    const setupTitle = document.querySelector(".setup-copy h2");
+    const setupBody = document.querySelector(".setup-copy > p");
+    if (setupTitle) setupTitle.textContent = isEnglish ? "Download, install, choose your audio, then start." : "Download, install, pilih audio, lalu mulai.";
+    if (setupBody) setupBody.textContent = isEnglish ? "You do not need to understand every audio term on day one. Start with the simple path and refine it later." : "Tidak perlu memahami semua istilah audio sejak awal. Ikuti jalur sederhana dulu; setelah sudah bunyi, baru rapikan setting pelan-pelan.";
+
     const licence = document.querySelector(".licence-section");
     if (licence) {
       const eyebrow = licence.querySelector(".licence-main .eyebrow");
@@ -307,15 +318,47 @@
       const afterBody = licence.querySelector(".licence-after p");
       if (eyebrow) eyebrow.textContent = isEnglish ? "FREE, WITHOUT THE CATCH" : "GRATIS, TANPA SYARAT RIBET";
       if (title) title.textContent = isEnglish ? "Download it and use it for free, forever." : "Download dan gunakan gratis selamanya.";
-      if (body) body.textContent = isEnglish ? "SC220 Live does not require a paid subscription, account login, credit card, or payment just to keep working. Install it, use it with your own setup, and keep using the free version for as long as you like." : "Silakan gunakan SC220 Live tanpa takut masa gratis habis. Tidak ada subscription berbayar yang diwajibkan, tidak perlu login, tidak perlu kartu kredit, dan tidak ada kewajiban membayar agar aplikasinya tetap bisa dipakai. Download, install, lalu gunakan selama Anda membutuhkannya.";
+      if (body) body.textContent = isEnglish ? "No required paid subscription, account login, credit card, or payment just to keep the app working. Install it, use it with your own setup, and keep using the free version for as long as you like." : "Tidak ada subscription berbayar yang diwajibkan, tidak perlu login, tidak perlu kartu kredit, dan tidak ada kewajiban membayar agar aplikasinya tetap bisa dipakai. Download, install, lalu gunakan selama Anda membutuhkannya.";
       if (afterSmall) afterSmall.textContent = isEnglish ? "IF YOU LOVE IT" : "KALAU ANDA SUKA";
       if (afterTitle) afterTitle.textContent = isEnglish ? "Full control is there when you want it" : "Full control bisa diaktifkan kapan saja";
-      if (afterBody) afterBody.innerHTML = isEnglish ? "If SC220 Live becomes part of your daily setup and you want every control unlocked, open <strong>License Activation</strong> inside the app. Activation is optional and kept affordable. <span class=\"license-signature\">An innovation from Mas Ari for the world.</span>" : "Kalau SC220 Live ternyata cocok dan Anda ingin semua kontrol terbuka, cukup masuk ke menu <strong>License Activation</strong> di dalam aplikasi. Aktivasi ini tidak wajib, dan harganya juga dibuat tidak mahal. <span class=\"license-signature\">Inovasi dari Mas Ari untuk Dunia.</span>";
+      if (afterBody) afterBody.innerHTML = isEnglish ? "If SC220 Live becomes part of your daily setup and you want every control unlocked, open <strong>License Activation</strong> inside the app. Activation is optional and kept affordable. <span class=\"license-signature\">An innovation from Mas Ari for the world.</span>" : "Kalau SC220 Live cocok dan Anda ingin semua kontrol terbuka, masuk ke menu <strong>License Activation</strong> di dalam aplikasi. Aktivasi ini tidak wajib, dan harganya dibuat tetap terjangkau. <span class=\"license-signature\">Inovasi dari Mas Ari untuk Dunia.</span>";
     }
+
+    const downloadTitle = document.querySelector(".download-copy h2");
+    const downloadBody = document.querySelector(".download-copy > p");
+    if (downloadTitle) downloadTitle.textContent = isEnglish ? "Ready to try it? Start with the official installer." : "Siap mencoba? Mulai dari installer resminya.";
+    if (downloadBody) downloadBody.textContent = isEnglish ? "The Windows x64 download below points to the official stable release. Version, publish date, and SHA-256 are shown beside it." : "Tombol di bawah mengarah ke rilis stabil resmi Windows x64. Nomor versi, tanggal rilis, dan SHA-256 tampil di sampingnya.";
 
     const reassurance = Array.from(document.querySelectorAll(".download-reassurance span"));
     if (reassurance[0]) reassurance[0].innerHTML = `<svg class="lucide" aria-hidden="true"><use href="#icon-check"/></svg>${isEnglish ? "Free forever" : "Gratis dipakai selamanya"}`;
     if (reassurance[1]) reassurance[1].innerHTML = `<svg class="lucide" aria-hidden="true"><use href="#icon-check"/></svg>${isEnglish ? "No required subscription" : "Tanpa subscription wajib"}`;
+
+    if (faq) {
+      faq.innerHTML = isEnglish
+        ? `<p class="eyebrow dark" data-reveal>THE BASICS</p><h2 data-reveal style="--reveal-delay:60ms">A few things worth knowing before you download.</h2>
+          <details data-reveal style="--reveal-delay:90ms"><summary><span>Is SC220 Live free?</span>${chevron}</summary><p><strong>Yes. You can keep using it for free.</strong> There is no required subscription, login, credit card, or payment just to keep the app working. If you enjoy it and want every control unlocked, full-control activation is available inside the app.</p></details>
+          <details data-reveal style="--reveal-delay:120ms"><summary><span>Do I need a Recording Tech SC220?</span>${chevron}</summary><p><strong>No.</strong> The SC220 is the interface we test and document most often, but the app is not locked to that hardware. Other Windows audio interfaces can be tried as long as Windows sees the device correctly and the routing fits your setup.</p></details>
+          <details data-reveal style="--reveal-delay:150ms"><summary><span>Is there a Mac version?</span>${chevron}</summary><p><strong>Yes.</strong> The macOS version is distributed separately. The main download button on this page is for Windows x64, so use the build that matches your operating system.</p></details>
+          <details data-reveal style="--reveal-delay:180ms"><summary><span>How do I download and install it?</span>${chevron}</summary><p>Click <strong>Download SC220 Live</strong>, open the installer, follow the setup steps, then choose your audio interface and output. New to routing? Start simple first—you can refine the setup later.</p></details>
+          <details data-reveal style="--reveal-delay:210ms"><summary><span>SmartScreen says Windows protected my PC. What should I do?</span>${chevron}</summary><p>This is common with software from newer developers. <strong>If the installer came from this official page, choose “More info”, then “Run anyway”.</strong> You do not need to disable your antivirus. SHA-256 is also available on this page if you want to verify the file first.</p></details>
+          <details data-reveal style="--reveal-delay:240ms"><summary><span>Do I have to install VB-CABLE?</span>${chevron}</summary><p>Not for every setup. VB-CABLE is useful when you need to pass the final mix into another Windows app as a virtual audio device, for example OBS or TikTok Live Studio.</p></details>
+          <details data-reveal style="--reveal-delay:270ms"><summary><span>Is SC220 Live a karaoke song player?</span>${chevron}</summary><p>No. It handles <strong>mixing, sound processing, metering, and routing</strong>. Songs and lyrics still come from your usual karaoke or playback app.</p></details>
+          <details data-reveal style="--reveal-delay:300ms"><summary><span>Can I use it with OBS or TikTok Live Studio?</span>${chevron}</summary><p>Yes. Send the final mix to a suitable Windows audio endpoint, then choose that same endpoint as the audio input in OBS, TikTok Live Studio, or another compatible app.</p></details>`
+        : `<p class="eyebrow dark" data-reveal>PERTANYAAN DASAR</p><h2 data-reveal style="--reveal-delay:60ms">Sebelum download, ini yang paling sering ingin diketahui.</h2>
+          <details data-reveal style="--reveal-delay:90ms"><summary><span>SC220 Live gratis atau berbayar?</span>${chevron}</summary><p><strong>Gratis dan boleh dipakai selamanya.</strong> Tidak ada kewajiban subscription, login, kartu kredit, atau pembayaran agar aplikasinya tetap bisa dipakai. Kalau nanti Anda suka dan ingin semua kontrol terbuka, full-control activation tersedia di dalam aplikasi.</p></details>
+          <details data-reveal style="--reveal-delay:120ms"><summary><span>Apakah harus punya Recording Tech SC220?</span>${chevron}</summary><p><strong>Tidak harus.</strong> SC220 memang perangkat yang paling sering diuji dan didokumentasikan, tetapi aplikasinya tidak dikunci hanya untuk SC220. Audio interface lain boleh dicoba selama terbaca dengan baik di Windows dan routing-nya cocok dengan setup Anda.</p></details>
+          <details data-reveal style="--reveal-delay:150ms"><summary><span>Ada versi untuk Mac?</span>${chevron}</summary><p><strong>Ada.</strong> Versi macOS didistribusikan terpisah. Tombol download utama di halaman ini adalah untuk Windows x64, jadi gunakan build yang sesuai dengan sistem operasi Anda.</p></details>
+          <details data-reveal style="--reveal-delay:180ms"><summary><span>Bagaimana cara download dan install?</span>${chevron}</summary><p>Klik <strong>Unduh SC220 Live</strong>, buka installer, ikuti langkah setup, lalu pilih audio interface dan output yang ingin dipakai. Masih awam soal routing? Mulai dari setup paling sederhana dulu—nanti bisa dirapikan pelan-pelan.</p></details>
+          <details data-reveal style="--reveal-delay:210ms"><summary><span>SmartScreen bilang Windows melindungi PC. Harus bagaimana?</span>${chevron}</summary><p>Pesan ini cukup umum pada software dari developer baru. <strong>Kalau installer berasal dari halaman resmi ini, klik “More info”, lalu pilih “Run anyway”.</strong> Tidak perlu mematikan antivirus. Kalau ingin cek dulu, SHA-256 resmi juga tersedia di halaman ini.</p></details>
+          <details data-reveal style="--reveal-delay:240ms"><summary><span>Apakah harus install VB-CABLE?</span>${chevron}</summary><p>Tidak selalu. VB-CABLE berguna kalau hasil mix dari SC220 Live perlu dikirim ke aplikasi Windows lain sebagai virtual audio device, misalnya OBS atau TikTok Live Studio.</p></details>
+          <details data-reveal style="--reveal-delay:270ms"><summary><span>SC220 Live itu aplikasi pemutar karaoke?</span>${chevron}</summary><p>Bukan. SC220 Live menangani <strong>mixing, pengolahan suara, meter, dan routing audio</strong>. Lagu dan lirik tetap berasal dari aplikasi karaoke atau player yang biasa Anda gunakan.</p></details>
+          <details data-reveal style="--reveal-delay:300ms"><summary><span>Bisa dipakai untuk OBS atau TikTok Live Studio?</span>${chevron}</summary><p>Bisa. Kirim mix akhir ke endpoint audio Windows yang sesuai, lalu pilih endpoint yang sama sebagai input audio di OBS, TikTok Live Studio, atau aplikasi kompatibel lainnya.</p></details>`;
+    }
+
+    if (requirements) {
+      const heading = requirements.querySelector("h2");
+      if (heading) heading.textContent = isEnglish ? "For the Windows installer on this page." : "Untuk installer Windows di halaman ini.";
+    }
 
     if (userQuestions && requirementsFaq) {
       requirementsFaq.insertAdjacentElement("afterend", userQuestions);
@@ -323,8 +366,8 @@
       const title = userQuestions.querySelector(".questions-heading h2");
       const lead = userQuestions.querySelector(".questions-heading > p");
       if (eyebrow) eyebrow.textContent = isEnglish ? "FROM USER COMMENTS" : "DARI KOMENTAR PENGGUNA";
-      if (title) title.textContent = isEnglish ? "A few real-world questions that come up after the basics." : "Pertanyaan lanjutan yang memang sering muncul.";
-      if (lead) lead.textContent = isEnglish ? "If the basics above are clear, these are the practical questions people often ask when they start matching SC220 Live to their own setup." : "Kalau pertanyaan dasar di atas sudah jelas, ini beberapa hal praktis yang sering ditanyakan saat orang mulai mencocokkan SC220 Live dengan setup mereka sendiri.";
+      if (title) title.textContent = isEnglish ? "Real questions that come up once people start trying it." : "Pertanyaan nyata yang muncul saat orang mulai mencoba.";
+      if (lead) lead.textContent = isEnglish ? "These came from the kinds of questions people ask when matching SC220 Live to their own hardware and apps." : "Bagian ini berisi hal-hal yang memang sering ditanyakan saat orang mulai mencocokkan SC220 Live dengan hardware dan aplikasi yang mereka pakai.";
 
       Array.from(userQuestions.querySelectorAll(".question-card")).forEach((card) => {
         const question = card.querySelector("summary strong")?.textContent || "";
@@ -345,7 +388,7 @@
   installP1GuidePromo();
 
   if (isLandingPage) {
-    refreshLandingFaqAndLicensing();
+    polishLandingCopy();
     initFeatureTour();
     initReveal();
     initProductTilt();
