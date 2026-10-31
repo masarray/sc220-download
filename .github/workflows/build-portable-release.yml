@@ -1,0 +1,284 @@
+name: Build SC220 Live Linux/macOS (official download release)
+
+# Trusted public distribution orchestration. No private code, credentials or
+# submodule source is committed to this public repository or release assets.
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/build-portable-release.yml'
+      - 'docs/PORTABLE_RELEASE_CI.md'
+  workflow_dispatch:
+    inputs:
+      source_sha:
+        description: 'Exact 40-character SHA of masarray/sc220-live/main (no branch refs)'
+        required: true
+        type: string
+      version:
+        description: 'Unused public preview tag, e.g. v0.1.2-portable-preview.1'
+        required: true
+        default: 'v0.1.2-portable-preview.1'
+        type: string
+      publish_release:
+        description: 'Publish validated compiled packages to sc220-download Releases'
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sc220-portable-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  preflight:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      source_sha: ${{ steps.source.outputs.source_sha }}
+      tag: ${{ steps.source.outputs.tag }}
+    steps:
+      - name: Validate pinned private source and preview release version
+        id: source
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.SC220_SOURCE_TOKEN }}
+          REQUESTED_SHA: ${{ inputs.source_sha }}
+          REQUESTED_VERSION: ${{ inputs.version }}
+        run: |
+          set -euo pipefail
+          if [[ -z "$GH_TOKEN" ]]; then
+            echo "::error::Configure public repository secret SC220_SOURCE_TOKEN with read access to private sc220-live AND askp-vst. No build can run without the canonical private source."
+            exit 1
+          fi
+          canonical_sha="$(gh api repos/masarray/sc220-live/branches/main --jq '.commit.sha')"
+          [[ "$canonical_sha" =~ ^[0-9a-f]{40}$ ]] || exit 2
+          # A private DSP authority must be available via the same read-only token.
+          gh api repos/masarray/askp-vst --jq '.full_name' | grep -Fx 'masarray/askp-vst'
+          if [[ "$GITHUB_EVENT_NAME" == "workflow_dispatch" ]]; then
+            [[ "$REQUESTED_SHA" =~ ^[0-9a-f]{40}$ ]] || { echo "::error::Invalid source commit SHA."; exit 2; }
+            [[ "$REQUESTED_SHA" == "$canonical_sha" ]] || { echo "::error::Source must match the current private main commit."; exit 2; }
+            tag="$REQUESTED_VERSION"
+          else
+            tag="v0.1.2-portable-preview.1"
+          fi
+          [[ "$tag" =~ ^v0\.1\.2-portable-preview\.[1-9][0-9]*$ ]] || { echo "::error::Invalid preview version."; exit 2; }
+          echo "source_sha=$canonical_sha" >> "$GITHUB_OUTPUT"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "Building verified private source $canonical_sha as $tag"
+
+  build:
+    name: ${{ matrix.label }}
+    needs: preflight
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 100
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - label: Linux x86_64 / native build & CTest
+            os: linux
+            runner: ubuntu-24.04
+          - label: macOS Intel + Apple Silicon / universal build & CTest
+            os: macos
+            runner: macos-15
+    steps:
+      - name: Checkout exact private source and pinned private DSP submodule
+        uses: actions/checkout@v4
+        with:
+          repository: masarray/sc220-live
+          ref: ${{ needs.preflight.outputs.source_sha }}
+          token: ${{ secrets.SC220_SOURCE_TOKEN }}
+          submodules: recursive
+          fetch-depth: 1
+          persist-credentials: false
+          path: source
+
+      - name: Verify audio-source authority
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$(git -C source rev-parse HEAD)" == "${{ needs.preflight.outputs.source_sha }}" ]]
+          [[ "$(git -C source/third_party/askp-vst rev-parse HEAD)" == "2c764f82b0fc99eaff04d918cef4f839db7509e5" ]]
+          test -f source/third_party/askp-vst/engine/arsonkupik_dsp.cpp
+          test -f source/scripts/package-portable.sh
+
+      - name: Install Linux native JUCE build prerequisites
+        if: matrix.os == 'linux'
+        shell: bash
+        run: |
+          sudo apt-get update -qq
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+            ninja-build pkg-config xvfb \
+            libasound2-dev libjack-jackd2-dev ladspa-sdk \
+            libfontconfig1-dev libfreetype6-dev \
+            libx11-dev libxcomposite-dev libxcursor-dev libxext-dev \
+            libxinerama-dev libxrandr-dev libxrender-dev libxi-dev \
+            libgl1-mesa-dev libglu1-mesa-dev
+
+      - name: Configure native Release application
+        shell: bash
+        run: |
+          set -euo pipefail
+          platform=()
+          if [[ "${{ matrix.os }}" == "macos" ]]; then
+            platform+=("-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64")
+            platform+=("-DCMAKE_OSX_DEPLOYMENT_TARGET=11.0")
+          fi
+          # A PUBLIC Actions log must not display CMake diagnostics containing
+          # lines from the proprietary private source checkout.
+          if ! cmake -S source -B source/build/portable -G Ninja \
+              -DCMAKE_BUILD_TYPE=Release \
+              -DSONKUPIK_BUILD_PARITY_QA=OFF "${platform[@]}" \
+              > "$RUNNER_TEMP/sc220-configure.log" 2>&1; then
+            echo "::error::Native CMake configuration failed. Logs are deliberately excluded from public Actions output to protect private source."
+            exit 1
+          fi
+          echo "Native CMake configuration passed."
+
+      - name: Compile application and DSP audits
+        shell: bash
+        run: |
+          if ! cmake --build source/build/portable --config Release --parallel 3 \
+              --target SC220Live SC220LoudnessAudit SC220ProgrammeAnalyzerAudit SC220PleasantPresenceAudit \
+              > "$RUNNER_TEMP/sc220-build.log" 2>&1; then
+            echo "::error::Native build failed. Compiler diagnostics are withheld from public Actions logs because they may quote proprietary source."
+            exit 1
+          fi
+          echo "Native GUI and DSP audit targets compiled."
+
+      - name: Execute compiled tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "${{ matrix.os }}" == "linux" ]]; then
+            if ! xvfb-run -a ctest --test-dir source/build/portable -C Release --output-on-failure \
+                > "$RUNNER_TEMP/sc220-test.log" 2>&1; then
+              echo "::error::Compiled Linux QA failed; raw test logs are not exposed in this public repository."
+              exit 1
+            fi
+          else
+            if ! ctest --test-dir source/build/portable -C Release --output-on-failure \
+                > "$RUNNER_TEMP/sc220-test.log" 2>&1; then
+              echo "::error::Compiled macOS QA failed; raw test logs are not exposed in this public repository."
+              exit 1
+            fi
+          fi
+          echo "Compiled QA passed."
+
+      - name: Package compiled binaries and generate SHA-256
+        shell: bash
+        run: |
+          bash source/scripts/package-portable.sh \
+            "${{ matrix.os }}" "${{ needs.preflight.outputs.tag }}" source/build/portable
+
+      - name: Enforce binary-only package output
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Exactly one platform package and one checksum.
+          if [[ "${{ matrix.os }}" == "linux" ]]; then
+            test "$(find source/dist -maxdepth 1 -name '*.tar.gz' | wc -l)" -eq 1
+            test "$(find source/dist -maxdepth 1 -name '*.dmg' | wc -l)" -eq 0
+          else
+            test "$(find source/dist -maxdepth 1 -name '*.dmg' | wc -l)" -eq 1
+            test "$(find source/dist -maxdepth 1 -name '*.tar.gz' | wc -l)" -eq 0
+          fi
+          test "$(find source/dist -maxdepth 1 -name '*.sha256' | wc -l)" -eq 1
+
+      - name: Upload only public distributable packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: sc220-portable-${{ matrix.os }}
+          path: |
+            source/dist/*.tar.gz
+            source/dist/*.dmg
+            source/dist/*.sha256
+          if-no-files-found: error
+          retention-days: 7
+
+  publish:
+    name: Publish official PUBLIC prerelease (never change Windows latest)
+    needs: [preflight, build]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.publish_release && github.ref == 'refs/heads/main' }}
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout official public release authority
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Download tested Linux/macOS binary-only artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: sc220-portable-*
+          merge-multiple: true
+          path: release-assets
+
+      - name: Inspect hashes and generate public provenance manifest
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ needs.preflight.outputs.tag }}
+          PRIVATE_COMMIT: ${{ needs.preflight.outputs.source_sha }}
+        run: |
+          set -euo pipefail
+          test "$(find release-assets -maxdepth 1 -name '*.tar.gz' | wc -l)" -eq 1
+          test "$(find release-assets -maxdepth 1 -name '*.dmg' | wc -l)" -eq 1
+          test "$(find release-assets -maxdepth 1 -name '*.sha256' | wc -l)" -eq 2
+          [[ "$PRIVATE_COMMIT" =~ ^[a-f0-9]{40}$ ]]
+          [[ "$RELEASE_TAG" =~ ^v0\.1\.2-portable-preview\.[1-9][0-9]*$ ]]
+          (cd release-assets && for file in *.sha256; do sha256sum --check "$file"; done)
+          if gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "::error::Release tag already exists: $RELEASE_TAG. Never replace immutable binaries."
+            exit 2
+          fi
+          stable_before="$(gh api "repos/$GITHUB_REPOSITORY/releases/latest" --jq '.tag_name')"
+          [[ "$stable_before" == "v0.1.2" ]] || {
+            echo "::error::Stable version changed from the reviewed v0.1.2. Reconcile release policy before publishing."
+            exit 2
+          }
+          printf '%s\n' "$PRIVATE_COMMIT" > release-assets/BUILD_COMMIT.txt
+          export RELEASE_TAG PRIVATE_COMMIT
+          python3 - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+          root = Path("release-assets")
+          assets = []
+          for p in sorted(root.iterdir()):
+              if p.suffix not in (".gz", ".dmg"):
+                  continue
+              assets.append({"name": p.name, "sha256": hashlib.sha256(p.read_bytes()).hexdigest(), "size_bytes": p.stat().st_size})
+          assert len(assets) == 2, "Expected Linux and macOS binary packages"
+          obj = {"product":"SC220 Live","tag":os.environ["RELEASE_TAG"],
+                 "channel":"portable-preview","source_repository":"masarray/sc220-live",
+                 "source_commit":os.environ["PRIVATE_COMMIT"],
+                 "distribution_repository":"masarray/sc220-download",
+                 "platforms":["linux-x64","macos-universal"],"packages":assets,
+                 "feature_parity_with_windows":False,
+                 "signing":"macOS ad-hoc only; not Apple notarized"}
+          (root / "PORTABLE_RELEASE_MANIFEST.json").write_text(json.dumps(obj,indent=2)+"\n")
+          PY
+
+      - name: Publish versioned assets to existing official public GitHub Releases
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ needs.preflight.outputs.tag }}
+        run: |
+          set -euo pipefail
+          gh release create "$RELEASE_TAG" release-assets/* \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" \
+            --title "SC220 Live $RELEASE_TAG — Linux/macOS preview" \
+            --notes-file docs/PORTABLE_RELEASE_CI.md \
+            --prerelease \
+            --latest=false
+          test "$(gh api "repos/$GITHUB_REPOSITORY/releases/latest" --jq '.tag_name')" = "v0.1.2"
+          gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --json assets,isPrerelease \
+            --jq '.isPrerelease and ([.assets[].name] | length == 6)' | grep -Fx true
