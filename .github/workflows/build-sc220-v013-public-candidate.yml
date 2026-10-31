@@ -1,0 +1,91 @@
+name: SC220 Live v0.1.3 Public Windows Release Candidate
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sc220-v013-public-release
+  cancel-in-progress: false
+
+jobs:
+  windows-release:
+    runs-on: windows-2022
+    timeout-minutes: 85
+    steps:
+      - name: Checkout latest approved PUBLIC SC220 source
+        shell: pwsh
+        run: |
+          git clone --depth 1 --single-branch --branch main https://github.com/masarray/sc220-live.git source
+          if ($LASTEXITCODE -ne 0) { throw "Public SC220 clone failed" }
+          $cmake=Get-Content source/CMakeLists.txt -Raw
+          if ($cmake -match 'ASKP_DSP_SOURCE|ASKP_GENERATED_DIR|askp-vst') { throw "Source still requires private ASK-P. Refuse release." }
+          if ($cmake -notmatch 'project\(SC220Live VERSION 0\.1\.3') { throw "SC220 source must be approved v0.1.3." }
+          "SOURCE_SHA=$((git -C source rev-parse HEAD).Trim())" | Add-Content $env:GITHUB_ENV
+      - name: Public CI source/engine validation
+        shell: pwsh
+        run: |
+          python source/qa/audit_sc220_asio_vst3.py
+          if ($LASTEXITCODE -ne 0) { throw "Source policy failed" }
+          cmake -P source/qa/verify_effective_cmake_pipeline.cmake
+          if ($LASTEXITCODE -ne 0) { throw "Canonical CMake generator failed" }
+      - name: Configure and build public Windows x64
+        shell: pwsh
+        run: |
+          cmake -S source -B build -G "Visual Studio 17 2022" -A x64
+          if ($LASTEXITCODE -ne 0) { throw "Public Windows configure failed" }
+          cmake --build build --config Release --target SC220Live SC220LoudnessAudit SC220ProgrammeAnalyzerAudit SC220PleasantPresenceAudit SC220BundledVstSmoke --parallel 2
+          if ($LASTEXITCODE -ne 0) { throw "Public Windows compilation failed" }
+          ctest --test-dir build -C Release --output-on-failure
+          if ($LASTEXITCODE -ne 0) { throw "Windows release QA failed" }
+      - name: Verify and bundle official ArSonKuPik v0.5.26 VST3
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          $url='https://github.com/masarray/vst-enhancer/releases/download/v0.5.26/ArSonKuPik-v0.5.26-Windows-x64-VST3.zip'
+          $sha='e53287c871166bcdc945b4962d7a38b5c93ad6cb0c0fa0bdd02fa42ff47cd5b6'
+          Invoke-WebRequest $url -OutFile first-party.zip -MaximumRedirection 5
+          if ((Get-FileHash first-party.zip -Algorithm SHA256).Hash.ToLowerInvariant() -cne $sha) { throw "Official VST3 hash mismatch" }
+          Expand-Archive first-party.zip -DestinationPath vsts -Force
+          $vst=Get-ChildItem vsts -Recurse -Filter '*.vst3' | Select-Object -First 1
+          if (-not $vst) { throw 'ArSonKuPik.vst3 not found in archive' }
+          $smoke=Get-ChildItem build/SC220BundledVstSmoke_artefacts -Recurse -File -Filter '*.exe' |
+            Where-Object { $_.FullName -match '\\Release\\' } | Select-Object -First 1
+          if (-not $smoke) { throw 'VST3 dual-instance smoke EXE missing' }
+          & $smoke.FullName $vst.FullName
+          if ($LASTEXITCODE -ne 0) { throw 'Bundled VST3 smoke failed; no release' }
+          $exe=Get-ChildItem build/SC220Live_artefacts -Recurse -File -Filter '*.exe' |
+            Where-Object { $_.FullName -match '\\Release\\' } | Select-Object -First 1
+          if (-not $exe) { throw 'SC220 Live EXE missing' }
+          New-Item -ItemType Directory -Path stage/Plugins -Force | Out-Null
+          Copy-Item $exe.FullName stage/
+          Copy-Item $vst.FullName stage/Plugins/ArSonKuPik.vst3 -Recurse -Force
+          Copy-Item source/THIRD_PARTY_NOTICES.md stage/
+          Copy-Item source/EULA.txt stage/
+          "Source SHA: $env:SOURCE_SHA" | Set-Content stage/PROVENANCE.txt
+          "First-party VST3: v0.5.26 (sha256:$sha)" | Add-Content stage/PROVENANCE.txt
+          @'
+          SC220 Live v0.1.3 RELEASE CANDIDATE (Windows x64)
+          Portable zip: unzip all files together, run SC220 Live.exe.
+          Native ASIO driver is optional and must be installed separately.
+          ArSonKuPik VST3 is included, with its own evaluation/licensing terms.
+          VB-CABLE is optional and NOT installed by this portable package.
+          Use Settings > Audio Setup for output routing. Start with 48kHz/256.
+          This candidate is unsigned and has not passed physical ASIO soak tests.
+          '@ | Set-Content stage/README-FIRST.txt
+          Compress-Archive 'stage/*' 'SC220-Live-v0.1.3-rc.1-Windows-x64-portable.zip' -Force
+          $outputHash=(Get-FileHash 'SC220-Live-v0.1.3-rc.1-Windows-x64-portable.zip' -Algorithm SHA256).Hash.ToLowerInvariant()
+          "$outputHash  SC220-Live-v0.1.3-rc.1-Windows-x64-portable.zip" | Set-Content 'SHA256SUMS.txt'
+      - name: Publish official PUBLIC prerelease (not stable)
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $ErrorActionPreference='Stop'
+          $tag='v0.1.3-rc.1'
+          gh release view $tag --repo masarray/sc220-download *> $null
+          if ($LASTEXITCODE -eq 0) { throw 'Release tag already exists. Refuse overwrite.' }
+          gh release create $tag --repo masarray/sc220-download --title 'SC220 Live v0.1.3 RC1 - Windows ASIO / First-party VST3' --prerelease --notes "PUBLIC Windows build from masarray/sc220-live main commit $env:SOURCE_SHA. Independent JUCE engine; pinned ArSonKuPik VST3 v0.5.26. No private DSP checkout or local runner. Portable/unsigned hardware preview; not production-stable until real ASIO and live-stream validation." 'SC220-Live-v0.1.3-rc.1-Windows-x64-portable.zip' 'SHA256SUMS.txt'
+          if ($LASTEXITCODE -ne 0) { throw 'GitHub public release creation failed' }
