@@ -1,12 +1,6 @@
 name: SC220 Windows ASIO + VST3 preview (manual test only)
 
 on:
-  # One-time automatic preview when the trusted workflow itself is updated.
-  # Subsequent SC220 source commits never trigger expensive builds automatically.
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/sc220-windows-asio-vst3-preview.yml'
   workflow_dispatch:
     inputs:
       source_sha:
