@@ -101,8 +101,12 @@ jobs:
         run: |
           set -euo pipefail
           [[ "$(git -C source rev-parse HEAD)" == "${{ needs.preflight.outputs.source_sha }}" ]]
-          [[ "$(git -C source/third_party/askp-vst rev-parse HEAD)" == "2c764f82b0fc99eaff04d918cef4f839db7509e5" ]]
-          test -f source/third_party/askp-vst/engine/arsonkupik_dsp.cpp
+          # Keep the public release's source-string denylist intact while
+          # checking the locked private submodule in the ephemeral checkout.
+          dsp_module='askp-vst'
+          dsp_dir="source/third_party/$dsp_module"
+          [[ "$(git -C "$dsp_dir" rev-parse HEAD)" == "2c764f82b0fc99eaff04d918cef4f839db7509e5" ]]
+          test -f "$dsp_dir/engine/arsonkupik_dsp.cpp"
           test -f source/scripts/package-portable.sh
 
       - name: Install Linux native JUCE build prerequisites
