@@ -36,10 +36,15 @@ jobs:
       - name: Public CI source/engine validation
         shell: pwsh
         run: |
-          python source/qa/audit_sc220_asio_vst3.py
-          if ($LASTEXITCODE -ne 0) { throw "Source policy failed" }
-          cmake -P source/qa/verify_effective_cmake_pipeline.cmake
-          if ($LASTEXITCODE -ne 0) { throw "Canonical CMake generator failed" }
+          Push-Location source
+          try {
+            python qa/audit_sc220_asio_vst3.py
+            if ($LASTEXITCODE -ne 0) { throw "Source policy failed" }
+            cmake -P qa/verify_effective_cmake_pipeline.cmake
+            if ($LASTEXITCODE -ne 0) { throw "Canonical CMake generator failed" }
+          } finally {
+            Pop-Location
+          }
       - name: Configure and build public Windows x64
         shell: pwsh
         run: |
