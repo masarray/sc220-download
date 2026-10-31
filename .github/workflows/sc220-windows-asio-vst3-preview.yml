@@ -1,0 +1,102 @@
+name: SC220 Windows ASIO + VST3 preview (manual test only)
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_sha:
+        description: 'Exact 40-character source commit SHA from the ASIO/VST3 branch'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sc220-windows-asio-preview
+  cancel-in-progress: false
+
+jobs:
+  build:
+    if: github.ref == 'refs/heads/main'
+    runs-on: windows-2022
+    timeout-minutes: 75
+    steps:
+      - name: Pin to the trusted SC220 feature branch (no arbitrary PR code)
+        shell: pwsh
+        env:
+          SOURCE_SHA: ${{ inputs.source_sha }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          if ($env:SOURCE_SHA -cnotmatch '^[0-9a-f]{40}$') { throw 'Invalid SHA; require exactly 40 lowercase hex characters.' }
+          $remote = (git ls-remote https://github.com/masarray/sc220-live.git refs/heads/feature/asio-input-vst3-and-public-runner-cleanup | Select-Object -First 1)
+          if (-not $remote) { throw 'Feature branch missing.' }
+          $head = ($remote -split '\s+')[0]
+          if ($head -cne $env:SOURCE_SHA) { throw "SHA is not the trusted feature branch head: $head" }
+
+      - name: Checkout source and private DSP with ephemeral read-only credentials
+        uses: actions/checkout@v4
+        with:
+          repository: masarray/sc220-live
+          ref: ${{ inputs.source_sha }}
+          token: ${{ secrets.SC220_SOURCE_TOKEN }}
+          submodules: recursive
+          fetch-depth: 1
+          persist-credentials: false
+          path: source
+
+      - name: Validate pinned DSP and effective source generation
+        shell: pwsh
+        env:
+          SOURCE_SHA: ${{ inputs.source_sha }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          if ((git -C source rev-parse HEAD).Trim() -cne $env:SOURCE_SHA) { throw 'Source SHA mismatch.' }
+          if ((git -C source/third_party/askp-vst rev-parse HEAD).Trim() -cne '2c764f82b0fc99eaff04d918cef4f839db7509e5') { throw 'Private ASK-P authority mismatch.' }
+          python source/qa/audit_sc220_asio_vst3.py
+          if ($LASTEXITCODE -ne 0) { throw 'Source guard failed.' }
+          cmake -P source/qa/verify_effective_cmake_pipeline.cmake
+          if ($LASTEXITCODE -ne 0) { throw 'Canonical CMake generator failed.' }
+
+      - name: Configure Windows x64 ASIO/VST3 app
+        shell: pwsh
+        run: |
+          cmake -S source -B build -G 'Visual Studio 17 2022' -A x64 -DSONKUPIK_BUILD_PARITY_QA=OFF
+          if ($LASTEXITCODE -ne 0) { throw 'Configure failed.' }
+
+      - name: Compile preview executable (not a public release)
+        shell: pwsh
+        run: |
+          cmake --build build --config Release --target SC220Live --parallel 2
+          if ($LASTEXITCODE -ne 0) { throw 'Windows compilation failed.' }
+
+      - name: Package unsigned EXE and verification instructions
+        shell: pwsh
+        env:
+          SOURCE_SHA: ${{ inputs.source_sha }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $exe = Get-ChildItem build/SC220Live_artefacts -Recurse -Filter '*.exe' -File |
+            Where-Object { $_.FullName -match '\\Release\\' } | Select-Object -First 1
+          if (-not $exe) { throw 'Release EXE not found.' }
+          New-Item -ItemType Directory -Path preview-package -Force | Out-Null
+          Copy-Item $exe.FullName -Destination preview-package/
+          $hash = (Get-FileHash $exe.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
+          "Source SHA: $env:SOURCE_SHA" | Set-Content preview-package/BUILD-INFO.txt
+          "EXE SHA256: $hash" | Add-Content preview-package/BUILD-INFO.txt
+          @'
+          SC220 Live ASIO/VST3 HARDWARE TEST - UNSIGNED DEVELOPMENT EXE
+          Install your own ASIO driver and ArSonVerb.vst3.
+          Use Audio Setup to select ASIO input/output from the same driver.
+          Test 48kHz/256, then 128, then 64 samples with physical hardware.
+          Voice Input -> + VST3 FX -> Load VST3 effect -> ArSonVerb.
+          Capture callback deadline misses and PC/Monitor FIFO underruns.
+          This is not the stable official release. Use trusted VST3 plugins only.
+          '@ | Set-Content preview-package/TEST-INSTRUCTIONS.txt
+
+      - name: Upload hardware-test binary for 5 days
+        uses: actions/upload-artifact@v4
+        with:
+          name: sc220-windows-asio-vst3-preview
+          path: preview-package/
+          if-no-files-found: error
+          retention-days: 5
