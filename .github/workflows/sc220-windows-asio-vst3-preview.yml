@@ -1,6 +1,12 @@
 name: SC220 Windows ASIO + VST3 preview (manual test only)
 
 on:
+  # One-time automatic preview when the trusted workflow itself is updated.
+  # Subsequent SC220 source commits never trigger expensive builds automatically.
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/sc220-windows-asio-vst3-preview.yml'
   workflow_dispatch:
     inputs:
       source_sha:
@@ -21,23 +27,30 @@ jobs:
     runs-on: windows-2022
     timeout-minutes: 75
     steps:
-      - name: Pin to the trusted SC220 feature branch (no arbitrary PR code)
+      - name: Pin trusted source and confirm private DSP permission
+        id: pin
         shell: pwsh
         env:
-          SOURCE_SHA: ${{ inputs.source_sha }}
+          REQUESTED_SHA: ${{ inputs.source_sha }}
+          GH_TOKEN: ${{ secrets.SC220_SOURCE_TOKEN }}
         run: |
           $ErrorActionPreference = 'Stop'
-          if ($env:SOURCE_SHA -cnotmatch '^[0-9a-f]{40}$') { throw 'Invalid SHA; require exactly 40 lowercase hex characters.' }
+          if (-not $env:GH_TOKEN) { throw 'SC220_SOURCE_TOKEN is not configured. Cannot build the private ASK-P authority.' }
+          gh api repos/masarray/askp-vst --jq .full_name
+          if ($LASTEXITCODE -ne 0) { throw 'SC220_SOURCE_TOKEN cannot read private ASK-P.' }
           $remote = (git ls-remote https://github.com/masarray/sc220-live.git refs/heads/feature/asio-input-vst3-and-public-runner-cleanup | Select-Object -First 1)
-          if (-not $remote) { throw 'Feature branch missing.' }
+          if (-not $remote) { throw 'Trusted feature branch missing.' }
           $head = ($remote -split '\s+')[0]
-          if ($head -cne $env:SOURCE_SHA) { throw "SHA is not the trusted feature branch head: $head" }
+          if ($head -cnotmatch '^[0-9a-f]{40}$') { throw 'Invalid trusted branch HEAD.' }
+          if ($env:REQUESTED_SHA -and $env:REQUESTED_SHA -cne $head) { throw "Requested SHA is not the trusted branch head: $head" }
+          "sha=$head" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+          Write-Host "Verified SC220 feature branch commit $head"
 
       - name: Checkout source and private DSP with ephemeral read-only credentials
         uses: actions/checkout@v4
         with:
           repository: masarray/sc220-live
-          ref: ${{ inputs.source_sha }}
+          ref: ${{ steps.pin.outputs.sha }}
           token: ${{ secrets.SC220_SOURCE_TOKEN }}
           submodules: recursive
           fetch-depth: 1
@@ -47,7 +60,7 @@ jobs:
       - name: Validate pinned DSP and effective source generation
         shell: pwsh
         env:
-          SOURCE_SHA: ${{ inputs.source_sha }}
+          SOURCE_SHA: ${{ steps.pin.outputs.sha }}
         run: |
           $ErrorActionPreference = 'Stop'
           if ((git -C source rev-parse HEAD).Trim() -cne $env:SOURCE_SHA) { throw 'Source SHA mismatch.' }
@@ -72,7 +85,7 @@ jobs:
       - name: Package unsigned EXE and verification instructions
         shell: pwsh
         env:
-          SOURCE_SHA: ${{ inputs.source_sha }}
+          SOURCE_SHA: ${{ steps.pin.outputs.sha }}
         run: |
           $ErrorActionPreference = 'Stop'
           $exe = Get-ChildItem build/SC220Live_artefacts -Recurse -Filter '*.exe' -File |
