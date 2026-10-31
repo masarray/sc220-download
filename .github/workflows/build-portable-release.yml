@@ -127,25 +127,46 @@ jobs:
             platform+=("-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64")
             platform+=("-DCMAKE_OSX_DEPLOYMENT_TARGET=11.0")
           fi
-          cmake -S source -B source/build/portable -G Ninja \
-            -DCMAKE_BUILD_TYPE=Release \
-            -DSONKUPIK_BUILD_PARITY_QA=OFF "${platform[@]}"
+          # A PUBLIC Actions log must not display CMake diagnostics containing
+          # lines from the proprietary private source checkout.
+          if ! cmake -S source -B source/build/portable -G Ninja \
+              -DCMAKE_BUILD_TYPE=Release \
+              -DSONKUPIK_BUILD_PARITY_QA=OFF "${platform[@]}" \
+              > "$RUNNER_TEMP/sc220-configure.log" 2>&1; then
+            echo "::error::Native CMake configuration failed. Logs are deliberately excluded from public Actions output to protect private source."
+            exit 1
+          fi
+          echo "Native CMake configuration passed."
 
       - name: Compile application and DSP audits
         shell: bash
         run: |
-          cmake --build source/build/portable --config Release --parallel 3 \
-            --target SC220Live SC220LoudnessAudit SC220ProgrammeAnalyzerAudit SC220PleasantPresenceAudit
+          if ! cmake --build source/build/portable --config Release --parallel 3 \
+              --target SC220Live SC220LoudnessAudit SC220ProgrammeAnalyzerAudit SC220PleasantPresenceAudit \
+              > "$RUNNER_TEMP/sc220-build.log" 2>&1; then
+            echo "::error::Native build failed. Compiler diagnostics are withheld from public Actions logs because they may quote proprietary source."
+            exit 1
+          fi
+          echo "Native GUI and DSP audit targets compiled."
 
       - name: Execute compiled tests
         shell: bash
         run: |
           set -euo pipefail
           if [[ "${{ matrix.os }}" == "linux" ]]; then
-            xvfb-run -a ctest --test-dir source/build/portable -C Release --output-on-failure
+            if ! xvfb-run -a ctest --test-dir source/build/portable -C Release --output-on-failure \
+                > "$RUNNER_TEMP/sc220-test.log" 2>&1; then
+              echo "::error::Compiled Linux QA failed; raw test logs are not exposed in this public repository."
+              exit 1
+            fi
           else
-            ctest --test-dir source/build/portable -C Release --output-on-failure
+            if ! ctest --test-dir source/build/portable -C Release --output-on-failure \
+                > "$RUNNER_TEMP/sc220-test.log" 2>&1; then
+              echo "::error::Compiled macOS QA failed; raw test logs are not exposed in this public repository."
+              exit 1
+            fi
           fi
+          echo "Compiled QA passed."
 
       - name: Package compiled binaries and generate SHA-256
         shell: bash
