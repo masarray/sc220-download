@@ -1,0 +1,148 @@
+name: SC220 Live Free Public Preview (Windows)
+
+# Promotion remains owned by sc220-download; no source/private DSP secrets.
+# The separately verified P13 source SHA is immutable for this prerelease.
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/build-sc220-free-public-preview.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sc220-live-free-public-preview
+  cancel-in-progress: false
+
+jobs:
+  public-free-windows:
+    runs-on: windows-2022
+    timeout-minutes: 95
+    env:
+      SOURCE_SHA: b2d3ba642809f829e3b05b658c3543f6af60d63b
+      PREVIEW_TAG: v0.1.3-free-preview.1
+    steps:
+      - name: Checkout public release authority
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Pin validated public source (no private runner or token)
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          git clone --depth 1 --single-branch --branch feature/original-ui-studio-one-fx-racks https://github.com/masarray/sc220-live.git source
+          if ($LASTEXITCODE -ne 0) { throw "Public SC220 clone failed" }
+          $actual=(git -C source rev-parse HEAD).Trim()
+          if ($actual -cne $env:SOURCE_SHA) { throw "Unreviewed source HEAD: $actual" }
+          $cmake=Get-Content source/CMakeLists.txt -Raw
+          if ($cmake -notmatch 'option\(SC220_LIVE_PUBLIC_FREE.*ON\)') { throw "Free preview must default ON" }
+          if ($cmake -match 'live/LicenseCheckoutClient\.cpp|live/LiveLicensePanel\.cpp|SONKUPIK_LICENSE_PRICE_IDR') { throw "Paid checkout was reintroduced" }
+          Write-Host "Verified immutable FREE SC220 source $actual"
+
+      - name: Enforce effective free-mode source and DAW UI generator
+        shell: pwsh
+        run: |
+          python source/qa/audit_sc220_asio_vst3.py
+          if ($LASTEXITCODE -ne 0) { throw "Realtime source policy failed" }
+          Push-Location source
+          try {
+            cmake -P qa/verify_effective_cmake_pipeline.cmake
+            if ($LASTEXITCODE -ne 0) { throw "Final P13 UI / free generator failed" }
+          } finally { Pop-Location }
+
+      - name: Configure, build and test Windows x64 Release
+        shell: pwsh
+        run: |
+          cmake -S source -B build -G "Visual Studio 17 2022" -A x64 -DSC220_LIVE_PUBLIC_FREE=ON
+          if ($LASTEXITCODE -ne 0) { throw "Windows CMake configure failed" }
+          cmake --build build --config Release --target SC220Live SC220LoudnessAudit SC220ProgrammeAnalyzerAudit SC220PleasantPresenceAudit SC220BundledVstSmoke --parallel 3
+          if ($LASTEXITCODE -ne 0) { throw "Windows Release build failed" }
+          ctest --test-dir build -C Release --output-on-failure
+          if ($LASTEXITCODE -ne 0) { throw "Compiled CTest failed" }
+
+      - name: Verify pinned ArSonKuPik and ArSonVerb VST3 archives
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          function Get-OuterVst3($directory) {
+            $bundle=Get-ChildItem $directory -Directory -Recurse -Force |
+              Where-Object { $_.Name.EndsWith('.vst3',[StringComparison]::OrdinalIgnoreCase) } |
+              Sort-Object { $_.FullName.Length } | Select-Object -First 1
+            if (-not $bundle) {
+              $bundle=Get-ChildItem $directory -File -Recurse -Force |
+                Where-Object { $_.Name.EndsWith('.vst3',[StringComparison]::OrdinalIgnoreCase) } |
+                Select-Object -First 1
+            }
+            if (-not $bundle) { throw "VST3 bundle missing in $directory" }
+            return $bundle
+          }
+          $kupikUrl='https://github.com/masarray/vst-enhancer/releases/download/v0.5.26/ArSonKuPik-v0.5.26-Windows-x64-VST3.zip'
+          $kupikHash='e53287c871166bcdc945b4962d7a38b5c93ad6cb0c0fa0bdd02fa42ff47cd5b6'
+          Invoke-WebRequest $kupikUrl -OutFile kupik.zip -MaximumRedirection 5
+          if ((Get-FileHash kupik.zip -Algorithm SHA256).Hash.ToLowerInvariant() -cne $kupikHash) { throw 'ArSonKuPik SHA256 mismatch' }
+          Expand-Archive kupik.zip -DestinationPath kupik -Force
+          $kupik=Get-OuterVst3 kupik
+          $smoke=Get-ChildItem build/SC220BundledVstSmoke_artefacts -Recurse -Filter '*.exe' -File |
+            Where-Object { $_.FullName -match '\\Release\\' } | Select-Object -First 1
+          if (-not $smoke) { throw 'Missing VST3 smoke executable' }
+          & $smoke.FullName $kupik.FullName
+          if ($LASTEXITCODE -ne 0) { throw 'ArSonKuPik VST3 hosting smoke test failed' }
+
+          $verbUrl='https://github.com/masarray/arsonverb/releases/download/v1.0.1/ArSonVerb-Windows-x64-VST3-v1.0.1.zip'
+          $verbHash='41fdf9132f26e55a1671fe6f00409a5219199b245be4dbccb7615fc4dd7c3e7b'
+          Invoke-WebRequest $verbUrl -OutFile verb.zip -MaximumRedirection 5
+          if ((Get-FileHash verb.zip -Algorithm SHA256).Hash.ToLowerInvariant() -cne $verbHash) { throw 'ArSonVerb SHA256 mismatch' }
+          Expand-Archive verb.zip -DestinationPath verb -Force
+          $verb=Get-OuterVst3 verb
+          "KUPIK_BUNDLE=$($kupik.FullName)" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+          "VERB_BUNDLE=$($verb.FullName)" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+
+      - name: Package free edition, proof and independent VST3 notices
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          $exe=Get-ChildItem build/SC220Live_artefacts -Recurse -Filter '*.exe' -File |
+            Where-Object { $_.FullName -match '\\Release\\' } | Select-Object -First 1
+          if (-not $exe) { throw 'SC220 Live Release EXE missing' }
+          New-Item -ItemType Directory -Path stage/Plugins -Force | Out-Null
+          Copy-Item -LiteralPath $exe.FullName -Destination 'stage/SC220 Live.exe'
+          Copy-Item -LiteralPath $env:KUPIK_BUNDLE -Destination 'stage/Plugins/ArSonKuPik.vst3' -Recurse -Force
+          Copy-Item -LiteralPath $env:VERB_BUNDLE -Destination 'stage/Plugins/ArSonVerb.vst3' -Recurse -Force
+          Copy-Item -LiteralPath source/THIRD_PARTY_NOTICES.md -Destination stage/
+          @"
+          SC220 LIVE - FREE PUBLIC PREVIEW (Windows x64)
+          Application price: FREE. No SC220 payment, 90-day deadline or activation required.
+          The public application is proprietary; source/redistribution rights are unchanged.
+          Bundled ArSonKuPik and ArSonVerb are separate VST3 products and retain their own terms.
+
+          Extract the entire ZIP and run SC220 Live.exe with Plugins/ beside it.
+          The approved SVG fader and three Voice / three PC Music FX slots are retained.
+          Click empty FX slot -> browse .vst3. Click filled slot -> VST3 editor.
+          Use the separate ON/OFF button to bypass each FX independently.
+          Stream output and physical Monitor are configurable; no fixed OBS setup is required.
+          Start with output muted at a safe level. Test ASIO 48 kHz / 256 samples
+          before 128 and 64. This is a hardware-test prerelease, not stable.
+          "@ | Set-Content stage/README-FIRST.txt
+          "SC220 Source Commit: $env:SOURCE_SHA" | Set-Content stage/PROVENANCE.txt
+          "ArSonKuPik official v0.5.26 ZIP SHA256: e53287c871166bcdc945b4962d7a38b5c93ad6cb0c0fa0bdd02fa42ff47cd5b6" | Add-Content stage/PROVENANCE.txt
+          "ArSonVerb official v1.0.1 ZIP SHA256: 41fdf9132f26e55a1671fe6f00409a5219199b245be4dbccb7615fc4dd7c3e7b" | Add-Content stage/PROVENANCE.txt
+          $zip="SC220-Live-$env:PREVIEW_TAG-Windows-x64-portable.zip"
+          Compress-Archive -Path 'stage/*' -DestinationPath $zip -CompressionLevel Optimal -Force
+          $sum=(Get-FileHash $zip -Algorithm SHA256).Hash.ToLowerInvariant()
+          "$sum  $zip" | Set-Content SHA256SUMS.txt
+          "PACKAGE=$zip" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+
+      - name: Publish immutable public prerelease (do not change stable/latest.json)
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $ErrorActionPreference='Stop'
+          gh release view $env:PREVIEW_TAG --repo masarray/sc220-download *> $null
+          if ($LASTEXITCODE -eq 0) { throw 'Immutable free-preview release already exists; never overwrite' }
+          $title="SC220 Live FREE Public Preview - Digital Mixer Windows x64"
+          $notes="Free SC220 application with no trial/payment gate, 3 Voice + 3 PC Music VST3 inserts, professional original-SVG-fader mixer UI. Pinned public source $env:SOURCE_SHA. Windows MSVC, CTest, VST smoke and SHA256 verified. Hardware ASIO/GUI acceptance pending. VST3 plugin licences remain separate. Stable latest v0.1.2 is unchanged."
+          gh release create $env:PREVIEW_TAG --repo masarray/sc220-download --prerelease --title $title --notes $notes $env:PACKAGE SHA256SUMS.txt
+          if ($LASTEXITCODE -ne 0) { throw 'Public free preview publish failed' }
